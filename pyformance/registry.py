@@ -242,5 +242,5 @@ def time_calls(fn):
     """
     def wrapper(*args):
         _timer = timer("%s_calls" % fn.__name__)
-        with _timer.time():
+        with _timer.time(fn=fn.__name__):
             fn(*args)

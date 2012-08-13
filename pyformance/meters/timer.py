@@ -3,7 +3,7 @@ from blinker import Namespace
 import time
 
 timer_signals = Namespace()
-too_long = timer_signals.signal("too_long")
+call_too_long = timer_signals.signal("call_too_long")
 
 class Timer(object):
     def __init__(self, threshold = None, clock = time):
@@ -68,8 +68,8 @@ class TimerContext(object):
     def stop(self):
         elapsed = self.clock.time() - self.start_time
         self.timer._update(elapsed)
-        if self.threshold and self.threshold <= elapsed:
-            too_long.send(self.timer, elapsed=elapsed, **self.kwargs)
+        if self.timer.threshold and self.timer.threshold < elapsed:
+            call_too_long.send(self.timer, elapsed=elapsed, **self.kwargs)
         return elapsed
     
     def __enter__(self):
