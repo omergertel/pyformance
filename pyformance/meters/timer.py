@@ -8,8 +8,8 @@ call_too_long = timer_signals.signal("call_too_long")
 class Timer(object):
     def __init__(self, threshold = None, clock = time):
         super(Timer, self).__init__()
-        self.meter = Meter(clock)
-        self.hist = Histogram(clock)
+        self.meter = Meter(clock=clock)
+        self.hist = Histogram(clock=clock)
         self.threshold = threshold
         
     def get_counter(self):
