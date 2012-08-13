@@ -5,7 +5,7 @@ class ManualClock(object):
         super(ManualClock, self).__init__()
         self.now = 0
         
-    def update(self, value):
+    def add(self, value):
         self.now = self.now + value
         
     def time(self):

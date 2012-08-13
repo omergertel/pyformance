@@ -1,5 +1,5 @@
 from tests import TimedTestCase
-from metrics.meters import Histogram
+from pyformance.meters import Histogram
 
 class HistogramTestCase(TimedTestCase):
     def test__a_sample_of_100_from_1000(self):
@@ -43,13 +43,13 @@ class HistogramTestCase(TimedTestCase):
         
         for i in xrange(1000):
             hist.add(1000+i)
-            self.clock.update(0.1)
+            self.clock.add(0.1)
             
         self.assertEqual(hist.get_snapshot().get_size(), 10)
         for i in hist.sample.get_snapshot().values:
             self.assertTrue(1000 <= i and i<= 2000)
             
-        self.clock.update(15*3600) # 15 hours, should trigger rescale
+        self.clock.add(15*3600) # 15 hours, should trigger rescale
         hist.add(2000)
         self.assertEqual(hist.get_snapshot().get_size(), 2)
         for i in hist.sample.get_snapshot().values:
@@ -57,7 +57,7 @@ class HistogramTestCase(TimedTestCase):
         
         for i in xrange(1000):
             hist.add(3000+i)
-            self.clock.update(0.1)
+            self.clock.add(0.1)
         self.assertEqual(hist.get_snapshot().get_size(), 10)
         for i in hist.sample.get_snapshot().values:
             self.assertTrue(3000 <= i and i<= 4000)   

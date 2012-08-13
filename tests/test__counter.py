@@ -1,5 +1,5 @@
 from unittest import TestCase
-from metrics import Counter
+from pyformance.meters import Counter
 
 class CounterTestCase(TestCase):
     
