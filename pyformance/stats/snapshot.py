@@ -7,8 +7,7 @@ class Snapshot(object):
     
     def __init__(self, values):
         super(Snapshot, self).__init__()
-        self.values = values
-        self.values.sort()
+        self.values = sorted(values)
         
     def get_size(self):
         return len(self.values)
