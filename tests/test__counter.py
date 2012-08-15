@@ -1,7 +1,7 @@
-from unittest import TestCase
+from . import TimedTestCase
 from pyformance.meters import Counter
 
-class CounterTestCase(TestCase):
+class CounterTestCase(TimedTestCase):
     
     def setUp(self):
         super(CounterTestCase, self).setUp()

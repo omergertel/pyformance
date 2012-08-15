@@ -1,4 +1,7 @@
-from unittest import TestCase
+if platform.python_version() < '2.7':
+    import unittest2 as unittest
+else:
+    import unittest
     
 class ManualClock(object):
     def __init__(self):
@@ -11,6 +14,6 @@ class ManualClock(object):
     def time(self):
         return self.now
     
-class TimedTestCase(TestCase):
+class TimedTestCase(unittest.TestCase):
     clock = ManualClock()
     

@@ -4,7 +4,7 @@ from pyformance.meters import Histogram
 class HistogramTestCase(TimedTestCase):
     def test__a_sample_of_100_from_1000(self):
         hist = Histogram(100,0.99)
-        for i in xrange(1000):
+        for i in range(1000):
             hist.add(i)
             
         self.assertEqual(1000, hist.get_count())
@@ -22,7 +22,7 @@ class HistogramTestCase(TimedTestCase):
         
     def test__a_sample_of_100_from_10(self):
         hist = Histogram(100,0.99)
-        for i in xrange(10):
+        for i in range(10):
             hist.add(i)
             
         self.assertEqual(10, hist.get_count())
@@ -41,7 +41,7 @@ class HistogramTestCase(TimedTestCase):
     def test__a_long_wait_should_not_corrupt_sample(self):
         hist = Histogram(10, 0.015, self.clock)
         
-        for i in xrange(1000):
+        for i in range(1000):
             hist.add(1000+i)
             self.clock.add(0.1)
             
@@ -55,7 +55,7 @@ class HistogramTestCase(TimedTestCase):
         for i in hist.sample.get_snapshot().values:
             self.assertTrue(1000 <= i and i<= 3000)
         
-        for i in xrange(1000):
+        for i in range(1000):
             hist.add(3000+i)
             self.clock.add(0.1)
         self.assertEqual(hist.get_snapshot().get_size(), 10)

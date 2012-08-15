@@ -32,7 +32,7 @@ You can use the 'count_calls' decorator to count the number of times a function 
     ... def test():
     ...     pass
     ... 
-    >>> for i in xrange(10):
+    >>> for i in range(10):
     ...     test()
     ... 
     >>> print counter("test_calls").get_count()
@@ -47,7 +47,7 @@ You can use the 'time_calls' decorator to time the execution of a function and g
     ... def test():
     ...     time.sleep(0.1)
     ... 
-    >>> for i in xrange(10):
+    >>> for i in range(10):
     ...     test()
     ... 
     >>> print timer("test_calls").get_mean()

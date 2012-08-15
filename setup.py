@@ -1,5 +1,6 @@
 import os
 import functools
+import platform
 from setuptools import setup, find_packages
 
 _IN_PACKAGE_DIR = functools.partial(os.path.join, "pyformance")
@@ -7,6 +8,10 @@ _IN_PACKAGE_DIR = functools.partial(os.path.join, "pyformance")
 with open(_IN_PACKAGE_DIR("__version__.py")) as version_file:
     exec(version_file.read())
 
+install_requires = ["blinker==1.2","six"]
+if platform.python_version() < '2.7':
+    install_requires.append('unittest2')
+    
 setup(name="pyformance",
       classifiers = [
           "Development Status :: 4 - Beta",
@@ -20,8 +25,6 @@ setup(name="pyformance",
       version=__version__,
       packages=find_packages(exclude=["tests"]),
       data_files = [],
-      install_requires=[
-        "blinker==1.2",
-          ],
+      install_requires=install_requires,
       scripts=[],
       )
