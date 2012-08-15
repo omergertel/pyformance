@@ -79,9 +79,10 @@ class ExpDecayingSample(object):
         self.next_time = self.clock.time() + ExpDecayingSample.RESCALE_THREASHOLD
         old_start_time = self.start_time
         self.start_time = self.clock.time()
+        new_values = {}
         for key, val in self.values.items():
-            del self.values[key]
-            self.values[key * math.exp(-self.alpha * (self.start_time - old_start_time))] = val
+            new_values[key * math.exp(-self.alpha * (self.start_time - old_start_time))] = val
+        self.values = new_values
         self.counter = len(self.values)
         
     def _weight(self, value):
