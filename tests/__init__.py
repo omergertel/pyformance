@@ -1,3 +1,4 @@
+import platform
 if platform.python_version() < '2.7':
     import unittest2 as unittest
 else:
