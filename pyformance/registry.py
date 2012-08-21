@@ -1,6 +1,7 @@
+import re
 from time import time
-
 from .meters import Counter, Histogram, Meter, Timer
+from six import iteritems
 
 class MetricsRegistry(object):
     """
@@ -77,62 +78,62 @@ class MetricsRegistry(object):
             self._timers[key] = Timer()
         return self._timers[key]
 
+    def clear(self):
+        self._meters.clear()
+        self._counters.clear()
+        self._gauges.clear()
+        self._timers.clear()
+        self._histograms.clear()
+
     def _get_counter_metrics(self, key):
-        metrics = {}
         if key in self._counters:
             counter = self._counters[key]
-            metrics["{0}_count".format(key)] = counter.get_count()
-        return metrics
+            return {"count": counter.get_count()}
+        return {}
 
     def _get_histogram_metrics(self, key):
-        metrics = {}
         if key in self._histograms:
             histogram = self._histograms[key]
             snapshot = histogram.get_snapshot()
-            for suffix, val in (("avg", histogram.get_mean()),
-                                ("max", histogram.get_max()),
-                                ("min", histogram.get_min()),
-                                ("std_dev", histogram.get_std_dev()),
-                                ("75_percentile", snapshot.get_75th_percentile()),
-                                ("98_percentile", snapshot.get_98th_percentile()),
-                                ("99_percentile", snapshot.get_99th_percentile()),
-                                ("999_percentile", snapshot.get_999th_percentile())):
-                k = "_".join([key, suffix])
-                metrics[k] = val
-        return metrics
+            res = {"avg": histogram.get_mean(),
+                   "max": histogram.get_max(),
+                   "min": histogram.get_min(),
+                   "std_dev": histogram.get_stddev(),
+                   "75_percentile": snapshot.get_75th_percentile(),
+                   "95_percentile": snapshot.get_95th_percentile(),
+                   "99_percentile": snapshot.get_99th_percentile(),
+                   "999_percentile": snapshot.get_999th_percentile()}
+            return res
+        return {}
 
     def _get_meter_metrics(self, key):
-        metrics = {}
-        if key in self._histograms:
+        if key in self._meters:
             meter = self._meters[key]
-            for suffix, val in (("15m_rate", meter.get_fifteen_minute_rate()),
-                                ("5m_rate", meter.get_five_minute_rate()),
-                                ("1m_rate", meter.get_one_minute_rate()),
-                                ("mean_rate", meter.get_mean_rate())):
-                k = "_".join([key, suffix])
-                metrics[k] = val
-        return metrics
+            res = {"15m_rate": meter.get_fifteen_minute_rate(),
+                   "5m_rate": meter.get_five_minute_rate(),
+                   "1m_rate": meter.get_one_minute_rate(),
+                   "mean_rate": meter.get_mean_rate()}
+            return res
+        return {}
 
     def _get_timer_metrics(self, key):
-        metrics = {}
-        if key in self._histograms:
+        if key in self._timers:
             timer = self._timers[key]
             snapshot = timer.get_snapshot()
-            for suffix, val in (("avg", timer.get_mean()),
-                                ("max", timer.get_max()),
-                                ("min", timer.get_min()),
-                                ("std_dev", timer.get_std_dev()),
-                                ("15m_rate", timer.get_fifteen_minute_rate()),
-                                ("5m_rate", timer.get_five_minute_rate()),
-                                ("1m_rate", timer.get_one_minute_rate()),
-                                ("mean_rate", timer.get_mean_rate()),
-                                ("75_percentile", snapshot.get_75th_percentile()),
-                                ("98_percentile", snapshot.get_98th_percentile()),
-                                ("99_percentile", snapshot.get_99th_percentile()),
-                                ("999_percentile", snapshot.get_999th_percentile())):
-                k = "_".join([key, suffix])
-                metrics[k] = val
-        return metrics
+            res = {"avg": timer.get_mean(),
+                   "max": timer.get_max(),
+                   "min": timer.get_min(),
+                   "std_dev": timer.get_stddev(),
+                   "15m_rate": timer.get_fifteen_minute_rate(),
+                   "5m_rate": timer.get_five_minute_rate(),
+                   "1m_rate": timer.get_one_minute_rate(),
+                   "mean_rate": timer.get_mean_rate(),
+                   "75_percentile": snapshot.get_75th_percentile(),
+                   "95_percentile": snapshot.get_95th_percentile(),
+                   "99_percentile": snapshot.get_99th_percentile(),
+                   "999_percentile": snapshot.get_999th_percentile()}
+            return res
+        return {}
 
     def get_metrics(self, key):
         """
@@ -146,7 +147,7 @@ class MetricsRegistry(object):
         metrics = {}
         for getter in (self._get_counter_metrics, self._get_histogram_metrics,
                        self._get_meter_metrics, self._get_timer_metrics):
-            metrics = dict(metrics.items() + getter().items())
+            metrics.update(getter(key))
         return metrics
 
     def dump_metrics(self):
@@ -156,23 +157,52 @@ class MetricsRegistry(object):
         @return: C{list} of C{dict} of metrics
         """
         metrics = {}
-        for metric_type, getter in ((self._counters, self._get_counter_metrics),
-                                    (self._histograms, self._get_histogram_metrics),
-                                    (self._meters, self._get_meter_metrics),
-                                    (self._timers, self._get_timer_metrics)):
+        for metric_type in (self._counters, 
+                            self._histograms,
+                            self._meters, 
+                            self._timers):
             for key in metric_type.keys():
-                metrics = dict(metrics.items() + getter(key).items())
+                metrics[key] = self.get_metrics(key)
                 
         return metrics
 
+class RegexRegistry(MetricsRegistry):
+    def __init__(self, pattern=None, clock=time):
+        super(RegexRegistry, self).__init__(clock)
+        if pattern is not None:
+            self.pattern = re.compile(pattern)
+        else:
+            self.pattern = re.compile('^$')
+    def _get_key(self, key):
+        matches = self.pattern.match(key)
+        if matches:
+            key = '/'.join((v for v in matches.groups() if v))
+        return key    
+    def timer(self, key):
+        return super(RegexRegistry, self).timer(self._get_key(key))
+    def histogram(self, key):
+        return super(RegexRegistry, self).histogram(self._get_key(key))
+    def counter(self, key):
+        return super(RegexRegistry, self).counter(self._get_key(key))
+    def gauge(self, key, gauge=None):
+        return super(RegexRegistry, self).gauge(self._get_key(key), gauge)
+    def meter(self, key):
+        return super(RegexRegistry, self).meter(self._get_key(key))
 
 _global_registry = MetricsRegistry()
 
-counter = _global_registry.counter
-histogram = _global_registry.histogram
-meter = _global_registry.meter
-timer = _global_registry.timer
-dump_metrics = _global_registry.dump_metrics
+def counter(key):
+    return _global_registry.counter(key)
+def histogram(key):
+    return _global_registry.histogram(key)
+def meter(key):
+    return _global_registry.meter(key)
+def timer(key):
+    return _global_registry.timer(key)
+def dump_metrics():
+    return _global_registry.dump_metrics()
+def clear():
+    return _global_registry.clear()
 
 def count_calls(fn):
     """

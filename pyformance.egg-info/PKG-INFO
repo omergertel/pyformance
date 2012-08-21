@@ -1,0 +1,13 @@
+Metadata-Version: 1.0
+Name: pyformance
+Version: 0.2
+Summary: Performance metrics, based on Coda Hale's Yammer metrics
+Home-page: UNKNOWN
+Author: Omer Getrel
+Author-email: omer.gertel@gmail.com
+License: Proprietary
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 2.7
