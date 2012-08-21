@@ -1,9 +1,6 @@
 import time, random, math
 from .snapshot import Snapshot
 
-DEFAULT_SIZE = 1028
-DEFAULT_ALPHA = 0.015
-    
 class ExpDecayingSample(object):
     """
     An exponentially-decaying random sample of longs. Uses Cormode et al's
@@ -16,7 +13,8 @@ class ExpDecayingSample(object):
           Streaming Systems. ICDE '09: Proceedings of the 2009 IEEE
           International Conference on Data Engineering (2009)</a>
     """
-    
+    DEFAULT_SIZE = 1028
+    DEFAULT_ALPHA = 0.015
     RESCALE_THREASHOLD = 3600.0 # 1 hour
     
     def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time):
