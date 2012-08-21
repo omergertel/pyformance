@@ -1,7 +1,6 @@
 import re
 from time import time
 from .meters import Counter, Histogram, Meter, Timer
-from six import iteritems
 
 class MetricsRegistry(object):
     """
