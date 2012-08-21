@@ -1,2 +1,0 @@
-blinker==1.2
-six
