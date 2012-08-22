@@ -20,6 +20,15 @@ Measures the statistical distribution of values in a data stream. Keeps track of
 ### Timer
 A useful combination of the Meter and the Histogram letting you measure the rate that a portion of code is called and a distribution of the duration of an operation. You can see, for example, how often your code hits the database and how long those operations tend to take.
 
+### Regex Grouping
+Useful when working with APIs. A RegexRegistry allows to group API calls and measure from a single location instead of having to define different timers in different places.
+
+    >>> from pyformance.registry import RegexRegistry
+    >>> reg = RegexRegistry(pattern='^/api/(?P<model>)/\d+/(?P<verb>)?$')
+    >>> def rest_api_request(path):
+    ...     with reg.timer(path).time():
+    ...         # do stuff
+    >>> print reg.dump_metrics()
 
 ## Examples
 ### Decorators
