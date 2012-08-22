@@ -95,6 +95,7 @@ class MetricsRegistry(object):
             histogram = self._histograms[key]
             snapshot = histogram.get_snapshot()
             res = {"avg": histogram.get_mean(),
+                   "count": histogram.get_count(),
                    "max": histogram.get_max(),
                    "min": histogram.get_min(),
                    "std_dev": histogram.get_stddev(),
@@ -120,6 +121,7 @@ class MetricsRegistry(object):
             timer = self._timers[key]
             snapshot = timer.get_snapshot()
             res = {"avg": timer.get_mean(),
+                   "count": timer.get_count(),
                    "max": timer.get_max(),
                    "min": timer.get_min(),
                    "std_dev": timer.get_stddev(),

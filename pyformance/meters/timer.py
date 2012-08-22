@@ -13,8 +13,8 @@ class Timer(object):
         self.hist = Histogram(clock=clock)
         self.threshold = threshold
         
-    def get_counter(self):
-        return self.hist.get_counter()
+    def get_count(self):
+        return self.hist.get_count()
     
     def get_sum(self):
         return self.hist.get_sum()
