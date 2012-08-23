@@ -8,7 +8,7 @@ _IN_PACKAGE_DIR = functools.partial(os.path.join, "pyformance")
 with open(_IN_PACKAGE_DIR("__version__.py")) as version_file:
     exec(version_file.read())
 
-install_requires = ["blinker==1.2","six"]
+install_requires = ["blinker==1.2","six>=1.1.0"]
 if platform.python_version() < '2.7':
     install_requires.append('unittest2')
     
