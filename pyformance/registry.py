@@ -184,9 +184,8 @@ class RegexRegistry(MetricsRegistry):
         else:
             self.pattern = re.compile('^$')
     def _get_key(self, key):
-        matches = self.pattern.match(key)
-        if matches:
-            key = '/'.join((v for v in matches.groups() if v))
+        matches = self.pattern.finditer(key)
+        key = '/'.join((v for match in matches for v in match.groups() if v))
         return key    
     def timer(self, key):
         return super(RegexRegistry, self).timer(self._get_key(key))
