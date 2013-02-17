@@ -30,6 +30,20 @@ Useful when working with APIs. A RegexRegistry allows to group API calls and mea
     ...         # do stuff
     >>> print reg.dump_metrics()
 
+## Reporters
+### Hosted Graphite Reporter
+A simple call which will periodically push out your metrics to [Hosted Graphite](https://www.hostedgraphite.com/) 
+using the HTTP Interface. 
+
+    registry = MetricsRegistry()	
+    #Push metrics contained in registry to hosted graphite every 10s for the account specified by Key
+	reporter = HostedGraphiteReporter(registry, 10, "XXXXXXXX-XXX-XXXXX-XXXX-XXXXXXXXXX")
+    # Some time later we increment metrics
+    histogram = registry.histogram("test.histogram")
+    histogram.add(0)
+	histogram.add(10)
+	histogram.add(25)
+
 ## Examples
 ### Decorators
 The simplest and easiest way to use the PyFormance library.
@@ -72,3 +86,4 @@ You can also use a timer using the with statement
     ...    time.sleep(0.1)
     >>> print timer("test_calls").get_mean()
     0.10114598274230957
+    
