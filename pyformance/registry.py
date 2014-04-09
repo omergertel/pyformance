@@ -9,7 +9,7 @@ class MetricsRegistry(object):
     a reference back to its service. The service would create a
     L{MetricsRegistry} to manage all of its metrics tools.
     """
-    def __init__(self, clock=time):
+    def __init__(self, clock = time):
         """
         Creates a new L{MetricsRegistry} instance.
         """
@@ -158,13 +158,13 @@ class MetricsRegistry(object):
         @return: C{list} of C{dict} of metrics
         """
         metrics = {}
-        for metric_type in (self._counters, 
+        for metric_type in (self._counters,
                             self._histograms,
-                            self._meters, 
+                            self._meters,
                             self._timers):
             for key in metric_type.keys():
                 metrics[key] = self.get_metrics(key)
-                
+
         return metrics
 
 class RegexRegistry(MetricsRegistry):
@@ -177,7 +177,7 @@ class RegexRegistry(MetricsRegistry):
         /api/users/1/edit -> users/edit
         /api/users/2/edit -> users/edit
     """
-    def __init__(self, pattern=None, clock=time):
+    def __init__(self, pattern = None, clock = time):
         super(RegexRegistry, self).__init__(clock)
         if pattern is not None:
             self.pattern = re.compile(pattern)
@@ -186,14 +186,14 @@ class RegexRegistry(MetricsRegistry):
     def _get_key(self, key):
         matches = self.pattern.finditer(key)
         key = '/'.join((v for match in matches for v in match.groups() if v))
-        return key    
+        return key
     def timer(self, key):
         return super(RegexRegistry, self).timer(self._get_key(key))
     def histogram(self, key):
         return super(RegexRegistry, self).histogram(self._get_key(key))
     def counter(self, key):
         return super(RegexRegistry, self).counter(self._get_key(key))
-    def gauge(self, key, gauge=None):
+    def gauge(self, key, gauge = None):
         return super(RegexRegistry, self).gauge(self._get_key(key), gauge)
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
@@ -281,5 +281,5 @@ def time_calls(fn):
     """
     def wrapper(*args):
         _timer = timer("%s_calls" % fn.__name__)
-        with _timer.time(fn=fn.__name__):
+        with _timer.time(fn = fn.__name__):
             fn(*args)
