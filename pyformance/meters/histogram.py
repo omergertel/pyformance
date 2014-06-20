@@ -1,33 +1,37 @@
-import time, math
+import time
+import math
 from threading import Lock
 from ..stats. samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
 
+
 class Histogram(object):
+
     """
     A metric which calculates the distribution of a value.
     """
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock = time):
+
+    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time):
         """
         Creates a new instance of a L{Histogram}.
-        """       
+        """
         super(Histogram, self).__init__()
         self.lock = Lock()
         self.clock = clock
         self.sample = ExpDecayingSample(size, alpha, clock)
         self.clear()
 
-    def add(self,value):
+    def add(self, value):
         """
         Add value to histogram
         """
         with self.lock:
             self.sample.update(value)
-            self.counter = self.counter+1
-            self.max = value if value>self.max else self.max
-            self.min = value if value<self.min else self.min
+            self.counter = self.counter + 1
+            self.max = value if value > self.max else self.max
+            self.min = value if value < self.min else self.min
             self.sum = self.sum + value
             self._update_var(value)
-            
+
     def clear(self):
         with self.lock:
             self.sample.clear()
@@ -35,45 +39,44 @@ class Histogram(object):
             self.max = -2147483647.0
             self.min = 2147483647.0
             self.sum = 0.0
-            self.var = [-1.0,0.0]
-    
+            self.var = [-1.0, 0.0]
+
     def get_count(self):
         return self.counter
-    
+
     def get_sum(self):
         return self.sum
-    
+
     def get_max(self):
         return self.max
-    
+
     def get_min(self):
         return self.min
-    
+
     def get_mean(self):
         if self.counter > 0:
             return self.sum / self.counter
         return 0
-    
+
     def get_stddev(self):
         if self.counter > 0:
             return math.sqrt(self.get_var())
         return 0
-    
+
     def get_var(self):
         if self.counter > 1:
-            return self.var[1] / (self.counter -1)
+            return self.var[1] / (self.counter - 1)
         return 0
-    
+
     def get_snapshot(self):
         return self.sample.get_snapshot()
-    
+
     def _update_var(self, value):
         old_m, old_s = self.var
-        new_m, new_s = [0.0,0.0]
+        new_m, new_s = [0.0, 0.0]
         if old_m == -1:
             new_m = value
         else:
-            new_m = old_m + ((value-old_m) / self.counter)
-            new_s = old_s + ((value-old_m) * (value - new_m))
+            new_m = old_m + ((value - old_m) / self.counter)
+            new_s = old_s + ((value - old_m) * (value - new_m))
         self.var = [new_m, new_s]
-                

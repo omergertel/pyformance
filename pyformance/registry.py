@@ -2,13 +2,16 @@ import re
 from time import time
 from .meters import Counter, Histogram, Meter, Timer
 
+
 class MetricsRegistry(object):
+
     """
     A single interface used to gather metrics on a service. It keeps track of
     all the relevant Counters, Meters, Histograms, and Timers. It does not have
     a reference back to its service. The service would create a
     L{MetricsRegistry} to manage all of its metrics tools.
     """
+
     def __init__(self, clock=time):
         """
         Creates a new L{MetricsRegistry} instance.
@@ -46,7 +49,7 @@ class MetricsRegistry(object):
             self._histograms[key] = Histogram()
         return self._histograms[key]
 
-    def gauge(self, key, gauge = None):
+    def gauge(self, key, gauge=None):
         if key not in self._gauges:
             self._gauges[key] = gauge
         return self._gauges[key]
@@ -158,16 +161,18 @@ class MetricsRegistry(object):
         @return: C{list} of C{dict} of metrics
         """
         metrics = {}
-        for metric_type in (self._counters, 
+        for metric_type in (self._counters,
                             self._histograms,
-                            self._meters, 
+                            self._meters,
                             self._timers):
             for key in metric_type.keys():
                 metrics[key] = self.get_metrics(key)
-                
+
         return metrics
 
+
 class RegexRegistry(MetricsRegistry):
+
     """
     A single interface used to gather metrics on a service. This class uses a regex to combine
     measures that match a pattern. For example, if you have a REST API, instead of defining
@@ -177,41 +182,60 @@ class RegexRegistry(MetricsRegistry):
         /api/users/1/edit -> users/edit
         /api/users/2/edit -> users/edit
     """
+
     def __init__(self, pattern=None, clock=time):
         super(RegexRegistry, self).__init__(clock)
         if pattern is not None:
             self.pattern = re.compile(pattern)
         else:
             self.pattern = re.compile('^$')
+
     def _get_key(self, key):
         matches = self.pattern.finditer(key)
         key = '/'.join((v for match in matches for v in match.groups() if v))
-        return key    
+        return key
+
     def timer(self, key):
         return super(RegexRegistry, self).timer(self._get_key(key))
+
     def histogram(self, key):
         return super(RegexRegistry, self).histogram(self._get_key(key))
+
     def counter(self, key):
         return super(RegexRegistry, self).counter(self._get_key(key))
+
     def gauge(self, key, gauge=None):
         return super(RegexRegistry, self).gauge(self._get_key(key), gauge)
+
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
 
 _global_registry = MetricsRegistry()
 
+
 def counter(key):
     return _global_registry.counter(key)
+
+
 def histogram(key):
     return _global_registry.histogram(key)
+
+
 def meter(key):
     return _global_registry.meter(key)
+
+
 def timer(key):
     return _global_registry.timer(key)
+
+
 def dump_metrics():
     return _global_registry.dump_metrics()
+
+
 def clear():
     return _global_registry.clear()
+
 
 def count_calls(fn):
     """
@@ -231,6 +255,7 @@ def count_calls(fn):
             raise
     return wrapper
 
+
 def meter_calls(fn):
     """
     Decorator to the rate at which a function is called.
@@ -248,6 +273,7 @@ def meter_calls(fn):
         except:
             raise
     return wrapper
+
 
 def hist_calls(fn):
     """
@@ -268,6 +294,7 @@ def hist_calls(fn):
         except:
             raise
     return wrapper
+
 
 def time_calls(fn):
     """
