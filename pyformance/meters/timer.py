@@ -1,11 +1,16 @@
 import time
-from blinker import Namespace
+try:
+    from blinker import Namespace
+except ImportError:
+    Namespace = None
 from .histogram import Histogram, DEFAULT_SIZE, DEFAULT_ALPHA
 from .meter import Meter
 
-timer_signals = Namespace()
-call_too_long = timer_signals.signal("call_too_long")
-
+if Namespace is not None:
+    timer_signals = Namespace()
+    call_too_long = timer_signals.signal("call_too_long")
+else:
+    call_too_long = None
 
 class Timer(object):
 
@@ -80,7 +85,7 @@ class TimerContext(object):
     def stop(self):
         elapsed = self.clock.time() - self.start_time
         self.timer._update(elapsed)
-        if self.timer.threshold and self.timer.threshold < elapsed:
+        if self.timer.threshold and self.timer.threshold < elapsed and call_too_long is not None:
             call_too_long.send(
                 self.timer, elapsed=elapsed, *self.args, **self.kwargs)
         return elapsed
