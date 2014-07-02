@@ -1,6 +1,6 @@
-__import__('pkg_resources').declare_namespace(__name__)
+# -*- coding: utf-8 -*-
 
 def HostedGraphiteReporter(*args, **kwargs):
-	# lazy import because HostedGraphiteReporter requires twisted
+	# lazy import because HostedGraphiteReporter
 	from .hosted_graphite_reporter import HostedGraphiteReporter as cls
 	return cls(*args, **kwargs)
