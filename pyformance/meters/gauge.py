@@ -19,14 +19,14 @@ class Gauge(object):
         raise NotImplementedError()
 
 
-class CallBackGauge(Gauge):
+class CallbackGauge(Gauge):
 
     """
     A Gauge reading for a given callback
     """
 
     def __init__(self, callback):
-        super(CallBackGauge, self).__init__()
+        super(CallbackGauge, self).__init__()
         self.callback = callback
 
     def get_value(self):

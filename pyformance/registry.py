@@ -1,6 +1,6 @@
 import re
 from time import time
-from .meters import Counter, Histogram, Meter, Timer
+from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge
 
 
 class MetricsRegistry(object):
@@ -51,6 +51,10 @@ class MetricsRegistry(object):
 
     def gauge(self, key, gauge=None):
         if key not in self._gauges:
+            assert gauge is not None, "gauge required for registering"
+            if not isinstance(gauge, Gauge):
+                assert callable(gauge), "gauge getter not callable"
+                gauge = CallbackGauge(gauge)
             self._gauges[key] = gauge
         return self._gauges[key]
 
@@ -91,6 +95,12 @@ class MetricsRegistry(object):
         if key in self._counters:
             counter = self._counters[key]
             return {"count": counter.get_count()}
+        return {}
+
+    def _get_gauge_metrics(self, key):
+        if key in self._gauges:
+            gauge = self._gauges[key]
+            return {"value": gauge.get_value()}
         return {}
 
     def _get_histogram_metrics(self, key):
@@ -150,7 +160,8 @@ class MetricsRegistry(object):
         """
         metrics = {}
         for getter in (self._get_counter_metrics, self._get_histogram_metrics,
-                       self._get_meter_metrics, self._get_timer_metrics):
+                       self._get_meter_metrics, self._get_timer_metrics,
+                       self._get_gauge_metrics):
             metrics.update(getter(key))
         return metrics
 
@@ -164,7 +175,8 @@ class MetricsRegistry(object):
         for metric_type in (self._counters,
                             self._histograms,
                             self._meters,
-                            self._timers):
+                            self._timers,
+                            self._gauges):
             for key in metric_type.keys():
                 metrics[key] = self.get_metrics(key)
 
@@ -227,6 +239,10 @@ def meter(key):
 
 def timer(key):
     return _global_registry.timer(key)
+
+
+def gauge(key, gauge=None):
+    return _global_registry.gauge(key, gauge)
 
 
 def dump_metrics():
