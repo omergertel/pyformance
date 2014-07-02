@@ -4,7 +4,6 @@ from ..stats.moving_average import ExpWeightedMovingAvg
 
 
 class Meter(object):
-
     """
     A meter metric which measures mean throughput and one-, five-, and fifteen-minute
     exponentially-weighted moving average throughputs.
@@ -14,11 +13,15 @@ class Meter(object):
         super(Meter, self).__init__()
         self.lock = Lock()
         self.clock = clock
-        self.start_time = self.clock.time()
-        self.counter = 0.0
-        self.m1rate = ExpWeightedMovingAvg(period=1, clock=self.clock)
-        self.m5rate = ExpWeightedMovingAvg(period=5, clock=self.clock)
-        self.m15rate = ExpWeightedMovingAvg(period=15, clock=self.clock)
+        self.clear()
+        
+    def clear(self):
+        with self.lock:
+            self.start_time = self.clock.time()
+            self.counter = 0.0
+            self.m1rate = ExpWeightedMovingAvg(period=1, clock=self.clock)
+            self.m5rate = ExpWeightedMovingAvg(period=5, clock=self.clock)
+            self.m15rate = ExpWeightedMovingAvg(period=15, clock=self.clock)
 
     def get_one_minute_rate(self):
         return self.m1rate.get_rate()
