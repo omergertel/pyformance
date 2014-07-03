@@ -51,9 +51,11 @@ class MetricsRegistry(object):
 
     def gauge(self, key, gauge=None):
         if key not in self._gauges:
-            assert gauge is not None, "gauge required for registering"
+            if gauge is None:
+                raise TypeError("gauge required for registering")
             if not isinstance(gauge, Gauge):
-                assert callable(gauge), "gauge getter not callable"
+                if not callable(gauge):
+                    raise TypeError("gauge getter not callable")
                 gauge = CallbackGauge(gauge)
             self._gauges[key] = gauge
         return self._gauges[key]
