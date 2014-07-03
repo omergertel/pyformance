@@ -17,7 +17,7 @@ class HostedGraphiteReporter(Reporter)
         self.url = url
         self.api_key = hosted_graphite_api_key
 
-    def send_metrics_now(self, registry=None):
+    def report_now(self, registry=None):
         metrics = self._collect_metrics(registry or self._registry)
         if metrics:
             try:

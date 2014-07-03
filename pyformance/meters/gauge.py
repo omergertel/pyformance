@@ -31,3 +31,20 @@ class CallbackGauge(Gauge):
 
     def get_value(self):
         return self.callback()
+
+    
+class SimpleGauge(Gauge):
+    """
+    A gauge which holds values with simple getter- and setter-interface
+    """
+    
+    def __init__(self, value=float("nan")):
+        super(SimpleGauge, self).__init__()
+        self._value = value
+
+    def get_value(self):
+        return self._value
+
+    def set_value(self, value):
+        # XXX: add locking?
+        self._value = value

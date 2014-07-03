@@ -1,6 +1,6 @@
 import re
 from time import time
-from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge
+from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
 
 
 class MetricsRegistry(object):
@@ -49,11 +49,11 @@ class MetricsRegistry(object):
             self._histograms[key] = Histogram()
         return self._histograms[key]
 
-    def gauge(self, key, gauge=None):
+    def gauge(self, key, gauge=None, default=float("nan")):
         if key not in self._gauges:
             if gauge is None:
-                raise TypeError("gauge required for registering")
-            if not isinstance(gauge, Gauge):
+                gauge = SimpleGauge(default)  # raise TypeError("gauge required for registering")
+            elif not isinstance(gauge, Gauge):
                 if not callable(gauge):
                     raise TypeError("gauge getter not callable")
                 gauge = CallbackGauge(gauge)
@@ -225,6 +225,10 @@ class RegexRegistry(MetricsRegistry):
         return super(RegexRegistry, self).meter(self._get_key(key))
 
 _global_registry = MetricsRegistry()
+
+
+def global_registry():
+    return _global_registry
 
 
 def counter(key):

@@ -21,7 +21,7 @@ class CarbonReporter(Reporter):
         self.socket_factory = socket_factory
         super(CarbonReporter, self).__init__(registry, reporting_interval)
 
-    def send_metrics_now(self, registry=None):
+    def report_now(self, registry=None):
         metrics = self._collect_metrics(registry or self.registry)
         if metrics:
             # XXX: keep connection open or use UDP?
