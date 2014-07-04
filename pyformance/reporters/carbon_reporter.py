@@ -26,7 +26,7 @@ class CarbonReporter(Reporter):
         if metrics:
             # XXX: keep connection open or use UDP?
             sock = self.socket_factory()
-            sock.connect((CARBON_SERVER, CARBON_PORT))
+            sock.connect((self.server, self.port))
             sock.sendall(metrics)
             sock.close()
             
