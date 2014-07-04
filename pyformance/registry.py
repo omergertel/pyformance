@@ -224,11 +224,17 @@ class RegexRegistry(MetricsRegistry):
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
 
+
 _global_registry = MetricsRegistry()
 
 
 def global_registry():
     return _global_registry
+
+
+def set_global_registry(registry):
+    global _global_registry
+    _global_registry = registry
 
 
 def counter(key):
