@@ -9,7 +9,7 @@ from pyformance.registry import MetricsRegistry
 from .reporter import Reporter
 
 
-class HostedGraphiteReporter(Reporter)
+class HostedGraphiteReporter(Reporter):
 
     def __init__(self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink",
                  clock=None):
