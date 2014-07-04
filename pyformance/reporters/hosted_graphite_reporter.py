@@ -3,7 +3,6 @@ from __future__ import print_function
 import sys
 import urllib2
 import base64
-import time
 
 from pyformance.meters import Counter, Histogram, Meter, Timer
 from pyformance.registry import MetricsRegistry
@@ -12,13 +11,14 @@ from .reporter import Reporter
 
 class HostedGraphiteReporter(Reporter)
 
-    def __init__(self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink"):
-        super(HostedGraphiteReporter, self).__init__(registry, reporting_interval)
+    def __init__(self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink",
+                 clock=None):
+        super(HostedGraphiteReporter, self).__init__(registry, reporting_interval, clock)
         self.url = url
         self.api_key = hosted_graphite_api_key
 
-    def report_now(self, registry=None):
-        metrics = self._collect_metrics(registry or self._registry)
+    def report_now(self, registry=None, timestamp=None):
+        metrics = self._collect_metrics(registry or self._registry, timestamp)
         if metrics:
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
@@ -30,7 +30,7 @@ class HostedGraphiteReporter(Reporter)
                 print(e, file=sys.stderr)
 
     def _collect_metrics(self, registry, timestamp=None):
-        timestamp = timestamp or int(round(time.time()))
+        timestamp = timestamp or int(round(self.clock.time()))
         metrics = registry.dump_metrics()
         metrics_data = []
         for key in metrics.keys():

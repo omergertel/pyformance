@@ -46,7 +46,7 @@ class MetricsRegistry(object):
         @return: L{Histogram}
         """
         if key not in self._histograms:
-            self._histograms[key] = Histogram()
+            self._histograms[key] = Histogram(clock=self._clock)
         return self._histograms[key]
 
     def gauge(self, key, gauge=None, default=float("nan")):
@@ -70,7 +70,7 @@ class MetricsRegistry(object):
         @return: L{Meter}
         """
         if key not in self._meters:
-            self._meters[key] = Meter()
+            self._meters[key] = Meter(clock=self._clock)
         return self._meters[key]
 
     def timer(self, key):
@@ -83,7 +83,7 @@ class MetricsRegistry(object):
         @return: L{Timer}
         """
         if key not in self._timers:
-            self._timers[key] = Timer()
+            self._timers[key] = Timer(clock=self._clock)
         return self._timers[key]
 
     def clear(self):

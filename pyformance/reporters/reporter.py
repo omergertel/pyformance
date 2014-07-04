@@ -4,9 +4,10 @@ from pyformance.registry import global_registry
 
 class Reporter(object):
     
-    def __init__(self, registry=None, reporting_interval=30):
+    def __init__(self, registry=None, reporting_interval=30, clock=None):
         self.registry = registry or global_registry()
         self.reporting_interval = reporting_interval
+        self.clock = clock or time
         self._stopped = Event()
         self._loop_thread = Thread(target=self._loop)
         self._loop_thread.setDaemon(True)
@@ -29,5 +30,5 @@ class Reporter(object):
             time.sleep(self.reporting_interval)
         # self._stopped.clear()
 
-    def report_now(self, registry=None):
+    def report_now(self, registry=None, timestamp=None):
         raise NotImplementedError(self.report_now)
