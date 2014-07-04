@@ -12,9 +12,11 @@ class TestConsoleReporter(TimedTestCase):
         self.output = StringIO()
         self.registry = MetricsRegistry(clock=self.clock)
         self.maxDiff = None
+        self.clock.now = 0
 
     def tearDown(self):
         super(TestConsoleReporter, self).tearDown()
+        self.clock.now = 0
         
     def test_report_now(self):
         r = ConsoleReporter(registry=self.registry, reporting_interval=1, stream=self.output, clock=self.clock)
