@@ -11,9 +11,15 @@ from .reporter import Reporter
 
 class HostedGraphiteReporter(Reporter):
 
-    def __init__(self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink",
-                 clock=None):
-        super(HostedGraphiteReporter, self).__init__(registry, reporting_interval, clock)
+    """
+    This reporter requires an api key from http://www.hostedgraphite.com
+    """
+
+    def __init__(
+        self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink",
+            clock=None):
+        super(HostedGraphiteReporter, self).__init__(
+            registry, reporting_interval, clock)
         self.url = url
         self.api_key = hosted_graphite_api_key
 
@@ -35,6 +41,7 @@ class HostedGraphiteReporter(Reporter):
         metrics_data = []
         for key in metrics.keys():
             for value_key in metrics[key].keys():
-                metric_line = "%s.%s %s %s\n" % (key, value_key, metrics[key][value_key], timestamp)
+                metric_line = "%s.%s %s %s\n" % (
+                    key, value_key, metrics[key][value_key], timestamp)
                 metrics_data.append(metric_line)
         return ''.join(metrics_data)

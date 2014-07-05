@@ -27,10 +27,10 @@ class MetricsRegistry(object):
         """
         Gets a counter based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Counter}
+        :return: L{Counter}
         """
         if key not in self._counters:
             self._counters[key] = Counter()
@@ -40,10 +40,10 @@ class MetricsRegistry(object):
         """
         Gets a histogram based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Histogram}
+        :return: L{Histogram}
         """
         if key not in self._histograms:
             self._histograms[key] = Histogram(clock=self._clock)
@@ -64,10 +64,10 @@ class MetricsRegistry(object):
         """
         Gets a meter based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Meter}
+        :return: L{Meter}
         """
         if key not in self._meters:
             self._meters[key] = Meter(clock=self._clock)
@@ -77,10 +77,10 @@ class MetricsRegistry(object):
         """
         Gets a timer based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Timer}
+        :return: L{Timer}
         """
         if key not in self._timers:
             self._timers[key] = Timer(clock=self._clock)
@@ -155,10 +155,10 @@ class MetricsRegistry(object):
         """
         Gets all the metrics for a specified key.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: C{dict}
+        :return: C{dict}
         """
         metrics = {}
         for getter in (self._get_counter_metrics, self._get_histogram_metrics,
@@ -171,7 +171,7 @@ class MetricsRegistry(object):
         """
         Formats all of the metrics and returns them as a dict.
 
-        @return: C{list} of C{dict} of metrics
+        :return: C{list} of C{dict} of metrics
         """
         metrics = {}
         for metric_type in (self._counters,
@@ -269,11 +269,11 @@ def count_calls(fn):
     """
     Decorator to track the number of times a function is called.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         counter("%s_calls" % fn.__name__).inc()
@@ -288,11 +288,11 @@ def meter_calls(fn):
     """
     Decorator to the rate at which a function is called.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         meter("%s_calls" % fn.__name__).mark()
@@ -307,11 +307,11 @@ def hist_calls(fn):
     """
     Decorator to check the distribution of return values of a function.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         _histogram = histogram("%s_calls" % fn.__name__)
@@ -328,11 +328,11 @@ def time_calls(fn):
     """
     Decorator to time the execution of the function.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         _timer = timer("%s_calls" % fn.__name__)

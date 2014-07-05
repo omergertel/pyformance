@@ -5,14 +5,15 @@ from pyformance import MetricsRegistry
 from pyformance.reporters.carbon_reporter import CarbonReporter
 from tests import TimedTestCase
 
+
 class TestCarbonReporter(TimedTestCase):
-    
+
     def setUp(self):
         super(TestCarbonReporter, self).setUp()
         self.output = StringIO()
         self.registry = MetricsRegistry(clock=self.clock)
         self.maxDiff = None
-        
+
     def connect(self, *args):
         # part of fake socket interface
         pass
@@ -20,21 +21,22 @@ class TestCarbonReporter(TimedTestCase):
     def sendall(self, data):
         # part of fake socket interface
         self.output.write(data)
-        
+
     def close(self):
         # part of fake socket interface
         pass
 
     def tearDown(self):
         super(TestCarbonReporter, self).tearDown()
-        
+
     def test_report_now(self):
-        r = CarbonReporter(registry=self.registry, reporting_interval=1, clock=self.clock,
-                           socket_factory=lambda :self)
+        r = CarbonReporter(
+            registry=self.registry, reporting_interval=1, clock=self.clock,
+            socket_factory=lambda: self)
         h1 = self.registry.histogram("hist")
         for i in range(10):
-            h1.add(2**i)
-        gcb = self.registry.gauge("gcb", lambda :123)
+            h1.add(2 ** i)
+        gcb = self.registry.gauge("gcb", lambda: 123)
         gsimple = self.registry.gauge("gsimple").set_value(42)
         t1 = self.registry.timer("t1")
         m1 = self.registry.meter("m1")
@@ -78,7 +80,7 @@ class TestCarbonReporter(TimedTestCase):
             'm1.5m_rate 0 1',
             'm1.mean_rate 1.0 1',
             'c1.count 1 1'
-            ]) 
+        ])
 
 
 if __name__ == "__main__":

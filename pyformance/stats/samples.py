@@ -28,13 +28,13 @@ class ExpDecayingSample(object):
         """
         Creates a new L{ExponentiallyDecayingSample}.
 
-        @type size: C{int}
-        @param size: the number of samples to keep in the sampling reservoir
-        @type alpha: C{float}
-        @param alpha: the exponential decay factor; the higher this is, the more
+        :type size: C{int}
+        :param size: the number of samples to keep in the sampling reservoir
+        :type alpha: C{float}
+        :param alpha: the exponential decay factor; the higher this is, the more
                       biased the sample will be towards newer values
-        @type clock: C{function}
-        @param clock: the function used to return the current time, default to
+        :type clock: C{function}
+        :param clock: the function used to return the current time, default to
                       seconds since the epoch; to be used with other time
                       units, or with the twisted clock for our testing purposes
         """
@@ -59,8 +59,8 @@ class ExpDecayingSample(object):
         """
         Adds a value to the sample.
 
-        @type value: C{int} or C{float}
-        @param value: the value to be added
+        :type value: C{int} or C{float}
+        :param value: the value to be added
         """
         if self.size == 0:
             return
