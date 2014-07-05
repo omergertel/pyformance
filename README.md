@@ -8,6 +8,9 @@ PyFormance is a toolset for performance measurement and statistics, with a signa
 
 ## Core Features
 
+### Gauge
+A gauge metric is an instantaneous reading of a particular value.
+
 ### Counter
 Simple interface to increment and decrement a value. For example, this can be used to measure the total number of jobs sent to the queue, as well as the pending (not yet complete) number of jobs in the queue. Simply increment the counter when an operation starts and decrement it when it completes.
 
