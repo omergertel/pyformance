@@ -52,7 +52,8 @@ class MetricsRegistry(object):
     def gauge(self, key, gauge=None, default=float("nan")):
         if key not in self._gauges:
             if gauge is None:
-                gauge = SimpleGauge(default)  # raise TypeError("gauge required for registering")
+                gauge = SimpleGauge(
+                    default)  # raise TypeError("gauge required for registering")
             elif not isinstance(gauge, Gauge):
                 if not callable(gauge):
                     raise TypeError("gauge getter not callable")

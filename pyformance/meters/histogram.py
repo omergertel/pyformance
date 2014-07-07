@@ -23,6 +23,8 @@ class Histogram(object):
     def add(self, value):
         """
         Add value to histogram
+        
+        :type value: float
         """
         with self.lock:
             self.sample.update(value)
@@ -33,6 +35,7 @@ class Histogram(object):
             self._update_var(value)
 
     def clear(self):
+        "reset histogram to initial state"
         with self.lock:
             self.sample.clear()
             self.counter = 0.0
@@ -42,33 +45,41 @@ class Histogram(object):
             self.var = [-1.0, 0.0]
 
     def get_count(self):
+        "get current value of counter"
         return self.counter
 
     def get_sum(self):
+        "get current sum"
         return self.sum
 
     def get_max(self):
+        "get current maximum"
         return self.max
 
     def get_min(self):
+        "get current minimum"
         return self.min
 
     def get_mean(self):
+        "get current mean"
         if self.counter > 0:
             return self.sum / self.counter
         return 0
 
     def get_stddev(self):
+        "get current standard deviation"
         if self.counter > 0:
             return math.sqrt(self.get_var())
         return 0
 
     def get_var(self):
+        "get current variance"
         if self.counter > 1:
             return self.var[1] / (self.counter - 1)
         return 0
 
     def get_snapshot(self):
+        "get snapshot instance which holds the percentiles"
         return self.sample.get_snapshot()
 
     def _update_var(self, value):

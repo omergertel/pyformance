@@ -26,6 +26,9 @@ Meters
 .. automodule:: pyformance.meters.histogram
    :members:
 
+.. automodule:: pyformance.stats.snapshot
+   :members:
+
 
 Reporters
 ---------
