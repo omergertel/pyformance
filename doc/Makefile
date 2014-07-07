@@ -1,7 +1,7 @@
 # Makefile for Sphinx documentation
 #
 # help automodule to find pyformance package
-PYTHONPATH := ../
+#PYTHONPATH := ../
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
