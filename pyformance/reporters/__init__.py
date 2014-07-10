@@ -16,3 +16,8 @@ def CarbonReporter(*args, **kwargs):
 def ConsoleReporter(*args, **kwargs):
     from .console_reporter import ConsoleReporter as cls
     return cls(*args, **kwargs)
+
+
+def CsvReporter(*args, **kwargs):
+    from .csv_reporter import CsvReporter as cls
+    return cls(*args, **kwargs)
