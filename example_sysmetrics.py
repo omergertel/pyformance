@@ -44,14 +44,19 @@ class Collector(object):
         for k, v in stats._asdict().iteritems():
             self.registry.gauge("phymem.%s" % k).set_value(v)
 
-    def collect_uptime(self):
-        uptime = int(time.time()) - int(psutil.BOOT_TIME)
-        self.registry.gauge("uptime").set_value(uptime)
-
+    def collect_swap_usage(self):
+        stats = psutil.swap_memory()
+        for k, v in stats._asdict().iteritems():
+            self.registry.gauge("swap.%s" % k).set_value(v)
+        
     def collect_virtmem_usage(self):
         stats = psutil.virtmem_usage()
         for k, v in stats._asdict().iteritems():
-            self.registry.gauge("virtmem.%s" % k).set_value(v)
+            self.registry.gauge("virtmem.%s" % k).set_value(v)    
+            
+    def collect_uptime(self):
+        uptime = int(time.time()) - int(psutil.BOOT_TIME)
+        self.registry.gauge("uptime").set_value(uptime)
 
     def collect_disk_usage(self, whitelist=[]):
         for partition in psutil.disk_partitions():
@@ -81,6 +86,7 @@ class Collector(object):
         self.collect_network_io()
         self.collect_phymem_usage()
         self.collect_virtmem_usage()
+        self.collect_swap_usage()
         self.collect_disk_usage()
         self.collect_loadavgs()
 
