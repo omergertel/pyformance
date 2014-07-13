@@ -13,7 +13,7 @@ class CarbonReporter(Reporter):
     Carbon is the network daemon to collect metrics for Graphite
     """
 
-    def __init__(self, registry, reporting_interval, prefix="",
+    def __init__(self, registry=None, reporting_interval=5, prefix="",
                  server=DEFAULT_CARBON_SERVER, port=DEFAULT_CARBON_PORT, socket_factory=socket.socket,
                  clock=None):
         super(CarbonReporter, self).__init__(
@@ -26,7 +26,7 @@ class CarbonReporter(Reporter):
     def report_now(self, registry=None, timestamp=None):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
-            # XXX: keep connection open or use UDP?
+            # XXX: keep connection open 
             sock = self.socket_factory()
             sock.connect((self.server, self.port))
             sock.sendall(metrics)
@@ -42,3 +42,17 @@ class CarbonReporter(Reporter):
                     self.prefix, key, value_key, metrics[key][value_key], timestamp)
                 metrics_data.append(metricLine)
         return ''.join(metrics_data)
+
+    
+class UdpCarbonReporter(CarbonReporter):
+    
+    """
+    The default CarbonReporter uses TCP.
+    This sub-class uses UDP instead which might be unreliable but it is faster
+    """
+    
+    def report_now(self, registry=None, timestamp=None):
+        metrics = self._collect_metrics(registry or self.registry, timestamp)
+        if metrics:
+            sock = self.socket_factory(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(metrics, (self.server, self.port))

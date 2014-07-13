@@ -13,6 +13,11 @@ def CarbonReporter(*args, **kwargs):
     return cls(*args, **kwargs)
 
 
+def UdpCarbonReporter(*args, **kwargs):
+    from .carbon_reporter import UdpCarbonReporter as cls
+    return cls(*args, **kwargs)
+
+
 def ConsoleReporter(*args, **kwargs):
     from .console_reporter import ConsoleReporter as cls
     return cls(*args, **kwargs)
