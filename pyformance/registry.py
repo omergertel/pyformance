@@ -150,7 +150,8 @@ class MetricsRegistry(object):
     def _get_meter_metrics(self, key):
         if key in self._meters:
             meter = self._meters[key]
-            res = {"15m_rate": meter.get_fifteen_minute_rate(),
+            res = {"count": meter.get_count(),
+                   "15m_rate": meter.get_fifteen_minute_rate(),
                    "5m_rate": meter.get_five_minute_rate(),
                    "1m_rate": meter.get_one_minute_rate(),
                    "mean_rate": meter.get_mean_rate()}
