@@ -1,5 +1,5 @@
 import re
-from time import time
+import time
 from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
 
 
