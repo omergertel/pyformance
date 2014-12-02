@@ -1,5 +1,8 @@
 import sys
-from StringIO import StringIO
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 from pyformance import MetricsRegistry
 from pyformance.reporters.console_reporter import ConsoleReporter
@@ -38,7 +41,7 @@ class TestConsoleReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         r.report_now()
-        self.assertEqual(self.output.getvalue().splitlines(), [
+        self.assertEqual(self.output.getvalue().splitlines().sort(), [
                          '== 1970-01-01 00:00:01 ===================================',
                          'counter-2:', '               count = -2',
                          'gsimple:', '               value = 42',
@@ -70,7 +73,7 @@ class TestConsoleReporter(TimedTestCase):
                          '            15m_rate = 0',
                          '             5m_rate = 0',
                          '           mean_rate = 1.0',
-                         'c1:', '               count = 1', ''])
+                         'c1:', '               count = 1', ''].sort())
 
 
 if __name__ == "__main__":

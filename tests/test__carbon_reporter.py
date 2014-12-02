@@ -1,5 +1,8 @@
 import sys
-from StringIO import StringIO
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 from pyformance import MetricsRegistry
 from pyformance.reporters.carbon_reporter import CarbonReporter
@@ -49,8 +52,9 @@ class TestCarbonReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         r.report_now()
-        self.assertEqual(self.output.getvalue().splitlines(), [
+        self.assertEqual(self.output.getvalue().splitlines().sort(), [
             'counter-2.count -2 1',
+            'c1.count 1 1',
             'gsimple.value 42 1',
             'gcb.value 123 1',
             't1.1m_rate 0 1',
@@ -80,8 +84,7 @@ class TestCarbonReporter(TimedTestCase):
             'm1.15m_rate 0 1',
             'm1.5m_rate 0 1',
             'm1.mean_rate 1.0 1',
-            'c1.count 1 1'
-        ])
+        ].sort())
 
 
 if __name__ == "__main__":
