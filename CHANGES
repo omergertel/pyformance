@@ -1,0 +1,13 @@
+Changed and new in fork
+
+* six required in setup.py but not used -> removed
+* blinker used only in Timer -> made it optional
+* license string in setup.py did not match LICENSE file -> corrected
+* gauge not fully implemented -> added missing parts including test and SimpleGauge class
+* merged pull request of HostedGraphiteReporter and refactored it 
+* added CarbonReporter and ConsoleReporter; included tests
+* fixed issue #4 (Meter.clear missing)
+* slightly reformatted code with autopep8
+* pass clock attribute from registry to meters (required for reporter-tests)
+* wrote a simple example script which collects system metrics
+* started documentation based on sphinx

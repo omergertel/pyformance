@@ -1,8 +1,10 @@
 import re
-from time import time
-from .meters import Counter, Histogram, Meter, Timer
+import time
+from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
+
 
 class MetricsRegistry(object):
+
     """
     A single interface used to gather metrics on a service. It keeps track of
     all the relevant Counters, Meters, Histograms, and Timers. It does not have
@@ -20,14 +22,39 @@ class MetricsRegistry(object):
         self._gauges = {}
         self._clock = clock
 
+    def add(self, key, metric):
+        """
+        Use this method to manually add custom metric instances to the registry
+        which are not created with their constructor's default arguments,
+        e.g. Histograms with a different size.
+        
+        :param key: name of the metric
+        :type key: C{str}
+        :param metric: instance of Histogram, Meter, Gauge, Timer or Counter
+        """
+        class_map = { 
+           Histogram: self._histograms,
+           Meter: self._meters,
+           Gauge: self.gauges,
+           Timer: self._timers,
+           Counter: self._counters,
+        }
+        for cls, registry in class_map.iteritems():
+            if isinstance(metric, cls):
+                if key in registry:
+                    raise LookupError("Metric %r already registered" % key)
+                registry[key] = registry
+                return
+        raise TypeError("Invalid class. Could not register metric %r" % key)
+
     def counter(self, key):
         """
         Gets a counter based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Counter}
+        :return: L{Counter}
         """
         if key not in self._counters:
             self._counters[key] = Counter()
@@ -37,17 +64,24 @@ class MetricsRegistry(object):
         """
         Gets a histogram based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Histogram}
+        :return: L{Histogram}
         """
         if key not in self._histograms:
-            self._histograms[key] = Histogram()
+            self._histograms[key] = Histogram(clock=self._clock)
         return self._histograms[key]
 
-    def gauge(self, key, gauge = None):
+    def gauge(self, key, gauge=None, default=float("nan")):
         if key not in self._gauges:
+            if gauge is None:
+                gauge = SimpleGauge(
+                    default)  # raise TypeError("gauge required for registering")
+            elif not isinstance(gauge, Gauge):
+                if not callable(gauge):
+                    raise TypeError("gauge getter not callable")
+                gauge = CallbackGauge(gauge)
             self._gauges[key] = gauge
         return self._gauges[key]
 
@@ -55,26 +89,26 @@ class MetricsRegistry(object):
         """
         Gets a meter based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Meter}
+        :return: L{Meter}
         """
         if key not in self._meters:
-            self._meters[key] = Meter()
+            self._meters[key] = Meter(clock=self._clock)
         return self._meters[key]
 
     def timer(self, key):
         """
         Gets a timer based on a key, creates a new one if it does not exist.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: L{Timer}
+        :return: L{Timer}
         """
         if key not in self._timers:
-            self._timers[key] = Timer()
+            self._timers[key] = Timer(clock=self._clock)
         return self._timers[key]
 
     def clear(self):
@@ -88,6 +122,12 @@ class MetricsRegistry(object):
         if key in self._counters:
             counter = self._counters[key]
             return {"count": counter.get_count()}
+        return {}
+
+    def _get_gauge_metrics(self, key):
+        if key in self._gauges:
+            gauge = self._gauges[key]
+            return {"value": gauge.get_value()}
         return {}
 
     def _get_histogram_metrics(self, key):
@@ -109,7 +149,8 @@ class MetricsRegistry(object):
     def _get_meter_metrics(self, key):
         if key in self._meters:
             meter = self._meters[key]
-            res = {"15m_rate": meter.get_fifteen_minute_rate(),
+            res = {"count": meter.get_count(),
+                   "15m_rate": meter.get_fifteen_minute_rate(),
                    "5m_rate": meter.get_five_minute_rate(),
                    "1m_rate": meter.get_one_minute_rate(),
                    "mean_rate": meter.get_mean_rate()}
@@ -140,14 +181,15 @@ class MetricsRegistry(object):
         """
         Gets all the metrics for a specified key.
 
-        @param key: name of the metric
-        @type key: C{str}
+        :param key: name of the metric
+        :type key: C{str}
 
-        @return: C{dict}
+        :return: C{dict}
         """
         metrics = {}
         for getter in (self._get_counter_metrics, self._get_histogram_metrics,
-                       self._get_meter_metrics, self._get_timer_metrics):
+                       self._get_meter_metrics, self._get_timer_metrics,
+                       self._get_gauge_metrics):
             metrics.update(getter(key))
         return metrics
 
@@ -155,19 +197,22 @@ class MetricsRegistry(object):
         """
         Formats all of the metrics and returns them as a dict.
 
-        @return: C{list} of C{dict} of metrics
+        :return: C{list} of C{dict} of metrics
         """
         metrics = {}
         for metric_type in (self._counters,
                             self._histograms,
                             self._meters,
-                            self._timers):
+                            self._timers,
+                            self._gauges):
             for key in metric_type.keys():
                 metrics[key] = self.get_metrics(key)
 
         return metrics
 
+
 class RegexRegistry(MetricsRegistry):
+
     """
     A single interface used to gather metrics on a service. This class uses a regex to combine
     measures that match a pattern. For example, if you have a REST API, instead of defining
@@ -183,45 +228,77 @@ class RegexRegistry(MetricsRegistry):
             self.pattern = re.compile(pattern)
         else:
             self.pattern = re.compile('^$')
+
     def _get_key(self, key):
         matches = self.pattern.finditer(key)
         key = '/'.join((v for match in matches for v in match.groups() if v))
         return key
+
     def timer(self, key):
         return super(RegexRegistry, self).timer(self._get_key(key))
+
     def histogram(self, key):
         return super(RegexRegistry, self).histogram(self._get_key(key))
+
     def counter(self, key):
         return super(RegexRegistry, self).counter(self._get_key(key))
-    def gauge(self, key, gauge = None):
+
+    def gauge(self, key, gauge=None):
         return super(RegexRegistry, self).gauge(self._get_key(key), gauge)
+
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
 
+
 _global_registry = MetricsRegistry()
+
+
+def global_registry():
+    return _global_registry
+
+
+def set_global_registry(registry):
+    global _global_registry
+    _global_registry = registry
+
 
 def counter(key):
     return _global_registry.counter(key)
+
+
 def histogram(key):
     return _global_registry.histogram(key)
+
+
 def meter(key):
     return _global_registry.meter(key)
+
+
 def timer(key):
     return _global_registry.timer(key)
+
+
+def gauge(key, gauge=None):
+    return _global_registry.gauge(key, gauge)
+
+
 def dump_metrics():
     return _global_registry.dump_metrics()
+
+
 def clear():
     return _global_registry.clear()
+
 
 def count_calls(fn):
     """
     Decorator to track the number of times a function is called.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         counter("%s_calls" % fn.__name__).inc()
@@ -231,15 +308,16 @@ def count_calls(fn):
             raise
     return wrapper
 
+
 def meter_calls(fn):
     """
     Decorator to the rate at which a function is called.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         meter("%s_calls" % fn.__name__).mark()
@@ -249,15 +327,16 @@ def meter_calls(fn):
             raise
     return wrapper
 
+
 def hist_calls(fn):
     """
     Decorator to check the distribution of return values of a function.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         _histogram = histogram("%s_calls" % fn.__name__)
@@ -269,15 +348,16 @@ def hist_calls(fn):
             raise
     return wrapper
 
+
 def time_calls(fn):
     """
     Decorator to time the execution of the function.
 
-    @param fn: the function to be decorated
-    @type fn: C{func}
+    :param fn: the function to be decorated
+    :type fn: C{func}
 
-    @return: the decorated function
-    @rtype: C{func}
+    :return: the decorated function
+    :rtype: C{func}
     """
     def wrapper(*args):
         _timer = timer("%s_calls" % fn.__name__)

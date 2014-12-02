@@ -1,10 +1,11 @@
 from . import TimedTestCase
 from pyformance.stats.moving_average import ExpWeightedMovingAvg
 
+
 class EWMATests(TimedTestCase):
 
     def test_one_minute_EWMA_five_sec_tick(self):
-        self.ewma = ExpWeightedMovingAvg(1, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(1, clock=self.clock)
 
         self.ewma.add(3)
         self.clock.add(5)
@@ -17,7 +18,7 @@ class EWMATests(TimedTestCase):
             self.clock.add(60)
 
     def test_five_minute_EWMA_five_sec_tick(self):
-        self.ewma = ExpWeightedMovingAvg(5, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(5, clock=self.clock)
 
         self.ewma.add(3)
         self.clock.add(5)
@@ -30,7 +31,7 @@ class EWMATests(TimedTestCase):
             self.clock.add(60)
 
     def test_fifteen_minute_EWMA_five_sec_tick(self):
-        self.ewma = ExpWeightedMovingAvg(15, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(15, clock=self.clock)
 
         self.ewma.add(3)
         self.clock.add(5)
@@ -43,7 +44,7 @@ class EWMATests(TimedTestCase):
             self.clock.add(60)
 
     def test_one_minute_EWMA_one_minute_tick(self):
-        self.ewma = ExpWeightedMovingAvg(1, 60, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(1, 60, clock=self.clock)
         self.ewma.add(3)
         self.clock.add(5)
         self.ewma.tick()
@@ -55,7 +56,7 @@ class EWMATests(TimedTestCase):
             self.clock.add(60)
 
     def test_five_minute_EWMA_one_minute_tick(self):
-        self.ewma = ExpWeightedMovingAvg(5, 60, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(5, 60, clock=self.clock)
 
         self.ewma.add(3)
         self.clock.add(5)
@@ -68,7 +69,7 @@ class EWMATests(TimedTestCase):
             self.clock.add(60)
 
     def test_fifteen_minute_EWMA_one_minute_tick(self):
-        self.ewma = ExpWeightedMovingAvg(15, 60, clock = self.clock)
+        self.ewma = ExpWeightedMovingAvg(15, 60, clock=self.clock)
 
         self.ewma.add(3)
         self.clock.add(5)

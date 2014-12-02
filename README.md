@@ -8,6 +8,9 @@ PyFormance is a toolset for performance measurement and statistics, with a signa
 
 ## Core Features
 
+### Gauge
+A gauge metric is an instantaneous reading of a particular value.
+
 ### Counter
 Simple interface to increment and decrement a value. For example, this can be used to measure the total number of jobs sent to the queue, as well as the pending (not yet complete) number of jobs in the queue. Simply increment the counter when an operation starts and decrement it when it completes.
 
@@ -29,6 +32,20 @@ Useful when working with APIs. A RegexRegistry allows to group API calls and mea
     ...     with reg.timer(path).time():
     ...         # do stuff
     >>> print reg.dump_metrics()
+
+## Reporters
+### Hosted Graphite Reporter
+A simple call which will periodically push out your metrics to [Hosted Graphite](https://www.hostedgraphite.com/) 
+using the HTTP Interface. 
+
+    registry = MetricsRegistry()	
+    #Push metrics contained in registry to hosted graphite every 10s for the account specified by Key
+	reporter = HostedGraphiteReporter(registry, 10, "XXXXXXXX-XXX-XXXXX-XXXX-XXXXXXXXXX")
+    # Some time later we increment metrics
+    histogram = registry.histogram("test.histogram")
+    histogram.add(0)
+	histogram.add(10)
+	histogram.add(25)
 
 ## Examples
 ### Decorators
@@ -72,3 +89,4 @@ You can also use a timer using the with statement
     ...    time.sleep(0.1)
     >>> print timer("test_calls").get_mean()
     0.10114598274230957
+    
