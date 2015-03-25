@@ -29,7 +29,7 @@ class CarbonReporter(Reporter):
             # XXX: keep connection open 
             sock = self.socket_factory()
             sock.connect((self.server, self.port))
-            sock.sendall(metrics)
+            sock.sendall(metrics.encode())
             sock.close()
 
     def _collect_metrics(self, registry, timestamp=None):
@@ -55,4 +55,4 @@ class UdpCarbonReporter(CarbonReporter):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             sock = self.socket_factory(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.sendto(metrics, (self.server, self.port))
+            sock.sendto(metrics.encode(), (self.server, self.port))
