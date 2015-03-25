@@ -303,7 +303,7 @@ def count_calls(fn):
     def wrapper(*args):
         counter("%s_calls" % fn.__name__).inc()
         try:
-            fn(*args)
+            return fn(*args)
         except:
             raise
     return wrapper
@@ -322,7 +322,7 @@ def meter_calls(fn):
     def wrapper(*args):
         meter("%s_calls" % fn.__name__).mark()
         try:
-            fn(*args)
+            return fn(*args)
         except:
             raise
     return wrapper
@@ -344,6 +344,7 @@ def hist_calls(fn):
             rtn = fn(*args)
             if type(rtn) in (int, float):
                 _histogram.update(rtn)
+            return rtn
         except:
             raise
     return wrapper
@@ -362,4 +363,5 @@ def time_calls(fn):
     def wrapper(*args):
         _timer = timer("%s_calls" % fn.__name__)
         with _timer.time(fn = fn.__name__):
-            fn(*args)
+            return fn(*args)
+    return wrapper
