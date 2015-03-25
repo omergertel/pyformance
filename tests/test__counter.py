@@ -1,5 +1,5 @@
-from . import TimedTestCase
 from pyformance.meters import Counter
+from tests import TimedTestCase
 
 
 class CounterTestCase(TimedTestCase):

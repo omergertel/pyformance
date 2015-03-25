@@ -1,5 +1,5 @@
-from . import TimedTestCase
 from pyformance.meters import CallbackGauge
+from tests import TimedTestCase
 
 
 class CallbackGaugeTestCase(TimedTestCase):

@@ -1,5 +1,5 @@
-from . import TimedTestCase
 from pyformance.stats.moving_average import ExpWeightedMovingAvg
+from tests import TimedTestCase
 
 
 class EWMATests(TimedTestCase):
