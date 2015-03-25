@@ -1,3 +1,4 @@
+import functools
 import re
 import time
 from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
@@ -300,10 +301,11 @@ def count_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
-    def wrapper(*args):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
         counter("%s_calls" % fn.__qualname__).inc()
         try:
-            return fn(*args)
+            return fn(*args, **kwargs)
         except:
             raise
     return wrapper
@@ -319,10 +321,11 @@ def meter_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
-    def wrapper(*args):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
         meter("%s_calls" % fn.__qualname__).mark()
         try:
-            return fn(*args)
+            return fn(*args, **kwargs)
         except:
             raise
     return wrapper
@@ -338,10 +341,11 @@ def hist_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
-    def wrapper(*args):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
         _histogram = histogram("%s_calls" % fn.__qualname__)
         try:
-            rtn = fn(*args)
+            rtn = fn(*args, **kwargs)
             if type(rtn) in (int, float):
                 _histogram.update(rtn)
             return rtn
@@ -360,9 +364,10 @@ def time_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
-    def wrapper(*args):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
         _timer = timer("%s_calls" % fn.__qualname__)
         with _timer.time(fn = fn.__qualname__):
-            return fn(*args)
+            return fn(*args, **kwargs)
     return wrapper
 
