@@ -301,7 +301,7 @@ def count_calls(fn):
     :rtype: C{func}
     """
     def wrapper(*args):
-        counter("%s_calls" % fn.__name__).inc()
+        counter("%s_calls" % fn.__qualname__).inc()
         try:
             return fn(*args)
         except:
@@ -320,7 +320,7 @@ def meter_calls(fn):
     :rtype: C{func}
     """
     def wrapper(*args):
-        meter("%s_calls" % fn.__name__).mark()
+        meter("%s_calls" % fn.__qualname__).mark()
         try:
             return fn(*args)
         except:
@@ -339,7 +339,7 @@ def hist_calls(fn):
     :rtype: C{func}
     """
     def wrapper(*args):
-        _histogram = histogram("%s_calls" % fn.__name__)
+        _histogram = histogram("%s_calls" % fn.__qualname__)
         try:
             rtn = fn(*args)
             if type(rtn) in (int, float):
@@ -361,7 +361,8 @@ def time_calls(fn):
     :rtype: C{func}
     """
     def wrapper(*args):
-        _timer = timer("%s_calls" % fn.__name__)
-        with _timer.time(fn = fn.__name__):
+        _timer = timer("%s_calls" % fn.__qualname__)
+        with _timer.time(fn = fn.__qualname__):
             return fn(*args)
     return wrapper
+
