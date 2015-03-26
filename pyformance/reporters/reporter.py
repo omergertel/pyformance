@@ -10,7 +10,7 @@ class Reporter(object):
         self.reporting_interval = reporting_interval
         self.clock = clock or time
         self._stopped = Event()
-        self._loop_thread = Thread(target=self._loop)
+        self._loop_thread = Thread(target=self._loop, name="pyformance reporter {}".format(self.__qualname__))
         self._loop_thread.setDaemon(True)
 
     def start(self):
