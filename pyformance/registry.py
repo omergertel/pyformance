@@ -163,6 +163,7 @@ class MetricsRegistry(object):
             timer = self._timers[key]
             snapshot = timer.get_snapshot()
             res = {"avg": timer.get_mean(),
+                   "sum": timer.get_sum(),
                    "count": timer.get_count(),
                    "max": timer.get_max(),
                    "min": timer.get_min(),
