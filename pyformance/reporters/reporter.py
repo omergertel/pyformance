@@ -14,7 +14,7 @@ class Reporter(object):
         self._loop_thread.setDaemon(True)
 
     def start(self):
-        if not self._stopped.is_set() and not self._loop_thread.is_alive():
+        if not self._stopped.is_set() and not self._loop_thread._started.is_set():
             self._loop_thread.start()
             return True
         return False
