@@ -23,7 +23,10 @@ class TestCarbonReporter(TimedTestCase):
 
     def sendall(self, data):
         # part of fake socket interface
-        self.output.write(data)
+        if sys.version_info[0] > 2:
+            self.output.write(data.decode())
+        else:
+            self.output.write(data)
 
     def close(self):
         # part of fake socket interface

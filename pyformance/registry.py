@@ -1,6 +1,7 @@
 import functools
 import re
 import time
+import sys
 from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
 
 
@@ -291,6 +292,10 @@ def dump_metrics():
 def clear():
     return _global_registry.clear()
 
+def get_qualname(obj):
+    if sys.version_info[0] > 2:
+        return obj.__qualname__
+    return obj.__name__
 
 def count_calls(fn):
     """
@@ -304,7 +309,7 @@ def count_calls(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        counter("%s_calls" % fn.__qualname__).inc()
+        counter("%s_calls" % get_qualname(fn)).inc()
         try:
             return fn(*args, **kwargs)
         except:
@@ -324,7 +329,7 @@ def meter_calls(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        meter("%s_calls" % fn.__qualname__).mark()
+        meter("%s_calls" % get_qualname(fn)).mark()
         try:
             return fn(*args, **kwargs)
         except:
@@ -344,7 +349,7 @@ def hist_calls(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        _histogram = histogram("%s_calls" % fn.__qualname__)
+        _histogram = histogram("%s_calls" % get_qualname(fn))
         try:
             rtn = fn(*args, **kwargs)
             if type(rtn) in (int, float):
@@ -367,8 +372,8 @@ def time_calls(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        _timer = timer("%s_calls" % fn.__qualname__)
-        with _timer.time(fn = fn.__qualname__):
+        _timer = timer("%s_calls" % get_qualname(fn))
+        with _timer.time(fn = get_qualname(fn)):
             return fn(*args, **kwargs)
     return wrapper
 
