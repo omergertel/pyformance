@@ -310,10 +310,7 @@ def count_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         counter("%s_calls" % get_qualname(fn)).inc()
-        try:
-            return fn(*args, **kwargs)
-        except:
-            raise
+        return fn(*args, **kwargs)
     return wrapper
 
 
@@ -330,10 +327,7 @@ def meter_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         meter("%s_calls" % get_qualname(fn)).mark()
-        try:
-            return fn(*args, **kwargs)
-        except:
-            raise
+        return fn(*args, **kwargs)
     return wrapper
 
 
@@ -350,13 +344,10 @@ def hist_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         _histogram = histogram("%s_calls" % get_qualname(fn))
-        try:
-            rtn = fn(*args, **kwargs)
-            if type(rtn) in (int, float):
-                _histogram.update(rtn)
-            return rtn
-        except:
-            raise
+        rtn = fn(*args, **kwargs)
+        if type(rtn) in (int, float):
+            _histogram.update(rtn)
+        return rtn
     return wrapper
 
 

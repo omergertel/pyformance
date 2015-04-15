@@ -45,7 +45,7 @@ class Snapshot(object):
         :param percentile: float value between 0 and 1
         """
         if percentile < 0 or percentile > 1:
-            raise ValueError("{} is not in [0..1]".format(percentile))
+            raise ValueError("{0} is not in [0..1]".format(percentile))
         length = len(self.values)
         if length == 0:
             return 0
