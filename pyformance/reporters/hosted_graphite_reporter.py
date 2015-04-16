@@ -24,7 +24,7 @@ class HostedGraphiteReporter(Reporter):
         self.api_key = hosted_graphite_api_key
 
     def report_now(self, registry=None, timestamp=None):
-        metrics = self._collect_metrics(registry or self._registry, timestamp)
+        metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
