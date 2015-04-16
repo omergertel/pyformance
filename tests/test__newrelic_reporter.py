@@ -1,5 +1,6 @@
 import os
 import socket
+from pyformance.registry import meter_calls
 from pyformance.reporters.newrelic_reporter import NewRelicReporter
 
 from pyformance import MetricsRegistry
@@ -40,4 +41,10 @@ class TestNewRelicReporter(TimedTestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    @meter_calls
+    def test():
+        pass
+
+    metrics_reporter = NewRelicReporter(license_key='c5604f3f5ae733774a56783e7a24efc79fcae19e', reporting_interval=60)
+    test()
+    metrics_reporter.report_now()

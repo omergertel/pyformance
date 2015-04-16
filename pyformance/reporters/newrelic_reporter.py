@@ -4,10 +4,13 @@ import json
 import os
 import socket
 import sys
+
 if sys.version_info[0] > 2:
     import urllib.request as urllib
+    import urllib.error as urlerror
 else:
     import urllib2 as urllib
+    import urllib2 as urlerror
 
 from pyformance.__version__ import __version__
 
@@ -18,7 +21,6 @@ DEFAULT_CARBON_PORT = 2003
 
 
 class NewRelicReporter(Reporter):
-
     """
     Reporter for new relic
     """
@@ -42,10 +44,12 @@ class NewRelicReporter(Reporter):
         if metrics:
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
-                request = urllib.Request(self.PLATFORM_URL, metrics)
+                request = urllib.Request(self.PLATFORM_URL, metrics.encode() if sys.version_info[0] > 2 else metrics)
                 for k, v in self.http_headers.items():
                     request.add_header(k, v)
-                urllib.urlopen(request)
+                result = urllib.urlopen(request)
+                if isinstance(result, urlerror.HTTPError):
+                    raise result
             except Exception as e:
                 print(e, file=sys.stderr)
 
@@ -63,24 +67,21 @@ class NewRelicReporter(Reporter):
     def create_metrics(self, input):
         results = {}
         for key in input.keys():
-            full_key = self.prefix + key
-
-            result = {}
-            results[full_key.replace('.', '/')] = result
 
             for value_key in input[key].keys():
-                result[value_key] = input[key][value_key]
+                full_key = 'Component/%s%s/%s' % (self.prefix, key, value_key)
+                results[full_key.replace('.', '/')] = input[key][value_key]
         return results
 
     def collect_metrics(self, registry):
         body = {
             'agent': self.agent_data,
             'components': [{
-                'guid': 'com.github.pyformance',
-                'name': socket.gethostname(),
-                'duration': self.reporting_interval,
-                'metrics': self.create_metrics(registry.dump_metrics())
-            }]
+                               'guid': 'com.github.pyformance',
+                               'name': socket.gethostname(),
+                               'duration': self.reporting_interval,
+                               'metrics': self.create_metrics(registry.dump_metrics())
+                           }]
         }
 
         return json.dumps(body, ensure_ascii=False, sort_keys=True)
