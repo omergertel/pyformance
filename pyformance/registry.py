@@ -29,19 +29,19 @@ class MetricsRegistry(object):
         Use this method to manually add custom metric instances to the registry
         which are not created with their constructor's default arguments,
         e.g. Histograms with a different size.
-        
+
         :param key: name of the metric
         :type key: C{str}
         :param metric: instance of Histogram, Meter, Gauge, Timer or Counter
         """
-        class_map = { 
-           Histogram: self._histograms,
-           Meter: self._meters,
-           Gauge: self._gauges,
-           Timer: self._timers,
-           Counter: self._counters,
-        }
-        for cls, registry in class_map.iteritems():
+        class_map = (
+           (Histogram, self._histograms),
+           (Meter, self._meters),
+           (Gauge, self._gauges),
+           (Timer, self._timers),
+           (Counter, self._counters),
+        )
+        for cls, registry in class_map:
             if isinstance(metric, cls):
                 if key in registry:
                     raise LookupError("Metric %r already registered" % key)
