@@ -37,7 +37,7 @@ class MetricsRegistry(object):
         class_map = { 
            Histogram: self._histograms,
            Meter: self._meters,
-           Gauge: self.gauges,
+           Gauge: self._gauges,
            Timer: self._timers,
            Counter: self._counters,
         }
