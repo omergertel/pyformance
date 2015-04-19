@@ -87,6 +87,6 @@ You can also use a timer using the with statement
     >>> from pyformance import timer
     >>> with timer("test").time():
     ...    time.sleep(0.1)
-    >>> print timer("test_calls").get_mean()
+    >>> print timer("test").get_mean()
     0.10114598274230957
     
