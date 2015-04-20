@@ -1,2 +1,5 @@
 pyformance.egg-info
 .idea
+/.tox/
+/build/
+/dist/
