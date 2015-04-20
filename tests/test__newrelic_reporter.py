@@ -34,7 +34,7 @@ class TestNewRelicReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         output = r.collect_metrics(self.registry)
-        expected = '{"agent": {"host": "%s", "pid": %s, "version": "0.3.1"}, "components": [{"duration": 1, "guid": "com.github.pyformance", ' \
+        expected = '{"agent": {"host": "%s", "pid": %s, "version": "0.3.2"}, "components": [{"duration": 1, "guid": "com.github.pyformance", ' \
                    '"metrics": {"Component/c1/count": 1, "Component/counter-2/count": -2, "Component/hist/75_percentile": 160, "Component/hist/95_percentile": 512, ' \
                    '"Component/hist/999_percentile": 512, "Component/hist/99_percentile": 512, "Component/hist/avg": 102.3, "Component/hist/count": 10, ' \
                    '"Component/hist/max": 512, "Component/hist/min": 1, "Component/hist/std_dev": 164.94851048466947, "Component/m1/15m_rate": 0, "Component/m1/1m_rate": 0, ' \
