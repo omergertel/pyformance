@@ -29,19 +29,19 @@ class MetricsRegistry(object):
         Use this method to manually add custom metric instances to the registry
         which are not created with their constructor's default arguments,
         e.g. Histograms with a different size.
-        
+
         :param key: name of the metric
         :type key: C{str}
         :param metric: instance of Histogram, Meter, Gauge, Timer or Counter
         """
-        class_map = { 
-           Histogram: self._histograms,
-           Meter: self._meters,
-           Gauge: self.gauges,
-           Timer: self._timers,
-           Counter: self._counters,
-        }
-        for cls, registry in class_map.iteritems():
+        class_map = (
+           (Histogram, self._histograms),
+           (Meter, self._meters),
+           (Gauge, self._gauges),
+           (Timer, self._timers),
+           (Counter, self._counters),
+        )
+        for cls, registry in class_map:
             if isinstance(metric, cls):
                 if key in registry:
                     raise LookupError("Metric %r already registered" % key)
@@ -310,10 +310,7 @@ def count_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         counter("%s_calls" % get_qualname(fn)).inc()
-        try:
-            return fn(*args, **kwargs)
-        except:
-            raise
+        return fn(*args, **kwargs)
     return wrapper
 
 
@@ -330,10 +327,7 @@ def meter_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         meter("%s_calls" % get_qualname(fn)).mark()
-        try:
-            return fn(*args, **kwargs)
-        except:
-            raise
+        return fn(*args, **kwargs)
     return wrapper
 
 
@@ -350,13 +344,10 @@ def hist_calls(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         _histogram = histogram("%s_calls" % get_qualname(fn))
-        try:
-            rtn = fn(*args, **kwargs)
-            if type(rtn) in (int, float):
-                _histogram.update(rtn)
-            return rtn
-        except:
-            raise
+        rtn = fn(*args, **kwargs)
+        if type(rtn) in (int, float):
+            _histogram.update(rtn)
+        return rtn
     return wrapper
 
 
