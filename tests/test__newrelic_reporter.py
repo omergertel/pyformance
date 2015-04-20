@@ -35,16 +35,6 @@ class TestNewRelicReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         output = r.collect_metrics(self.registry)
-        self.assertEqual('{"agent": {"host": "%s", "pid": %s, "version": "0.3.1"}, "components": [{"duration": 1, "guid": "com.github.pyformance", "metrics": {"c1": {"count": 1}, "counter-2": {"count": -2}, "hist": {"75_percentile": 160.0, "95_percentile": 512, "999_percentile": 512, "99_percentile": 512, "avg": 102.3, "count": 10.0, "max": 512, "min": 1, "std_dev": 164.94851048466947}, "m1": {"15m_rate": 0, "1m_rate": 0, "5m_rate": 0, "count": 1.0, "mean_rate": 1.0}, "t1": {"15m_rate": 0, "1m_rate": 0, "5m_rate": 0, "75_percentile": 1, "95_percentile": 1, "999_percentile": 1, "99_percentile": 1, "avg": 1.0, "count": 1.0, "max": 1, "mean_rate": 1.0, "min": 1, "std_dev": 0.0, "sum": 1.0}}, "name": "gregor"}]}'
-                         % (socket.gethostname(), os.getpid()),
+        self.assertEqual('{"agent": {"host": "%s", "pid": %s, "version": "0.3.1"}, "components": [{"duration": 1, "guid": "com.github.pyformance", "metrics": {"Component/c1/count": 1, "Component/counter-2/count": -2, "Component/hist/75_percentile": 160.0, "Component/hist/95_percentile": 512, "Component/hist/999_percentile": 512, "Component/hist/99_percentile": 512, "Component/hist/avg": 102.3, "Component/hist/count": 10.0, "Component/hist/max": 512, "Component/hist/min": 1, "Component/hist/std_dev": 164.94851048466947, "Component/m1/15m_rate": 0, "Component/m1/1m_rate": 0, "Component/m1/5m_rate": 0, "Component/m1/count": 1.0, "Component/m1/mean_rate": 1.0, "Component/t1/15m_rate": 0, "Component/t1/1m_rate": 0, "Component/t1/5m_rate": 0, "Component/t1/75_percentile": 1, "Component/t1/95_percentile": 1, "Component/t1/999_percentile": 1, "Component/t1/99_percentile": 1, "Component/t1/avg": 1.0, "Component/t1/count": 1.0, "Component/t1/max": 1, "Component/t1/mean_rate": 1.0, "Component/t1/min": 1, "Component/t1/std_dev": 0.0, "Component/t1/sum": 1.0}, "name": "%s"}]}'
+                         % (socket.gethostname(), os.getpid(), socket.gethostname()),
                          output)
-
-
-if __name__ == "__main__":
-    @meter_calls
-    def test():
-        pass
-
-    metrics_reporter = NewRelicReporter(license_key='c5604f3f5ae733774a56783e7a24efc79fcae19e', reporting_interval=60)
-    test()
-    metrics_reporter.report_now()
