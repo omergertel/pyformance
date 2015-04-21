@@ -1,15 +1,14 @@
 import os
 import socket
 
-from pyformance.reporters.newrelic_reporter import NewRelicReporter
-from pyformance import MetricsRegistry
+from pyformance.reporters.newrelic_reporter import NewRelicReporter, NewRelicRegistry
 from tests import TimedTestCase
 
 
 class TestNewRelicReporter(TimedTestCase):
     def setUp(self):
         super(TestNewRelicReporter, self).setUp()
-        self.registry = MetricsRegistry(clock=self.clock)
+        self.registry = NewRelicRegistry(clock=self.clock)
         self.maxDiff = None
 
     def tearDown(self):
@@ -33,13 +32,7 @@ class TestNewRelicReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         output = r.collect_metrics(self.registry)
-        expected = '{"agent": {"host": "%s", "pid": %s, "version": "0.3.2"}, "components": [{"duration": 1, "guid": "com.github.pyformance", ' \
-                   '"metrics": {"Component/c1/count": 1, "Component/counter-2/count": -2, "Component/hist/75_percentile": 160, "Component/hist/95_percentile": 512, ' \
-                   '"Component/hist/999_percentile": 512, "Component/hist/99_percentile": 512, "Component/hist/avg": 102.3, "Component/hist/count": 10, ' \
-                   '"Component/hist/max": 512, "Component/hist/min": 1, "Component/hist/std_dev": 164.94851048466947, "Component/m1/15m_rate": 0, "Component/m1/1m_rate": 0, ' \
-                   '"Component/m1/5m_rate": 0, "Component/m1/count": 1, "Component/m1/mean_rate": 1, "Component/t1/15m_rate": 0, "Component/t1/1m_rate": 0, ' \
-                   '"Component/t1/5m_rate": 0, "Component/t1/75_percentile": 1, "Component/t1/95_percentile": 1, "Component/t1/999_percentile": 1, ' \
-                   '"Component/t1/99_percentile": 1, "Component/t1/avg": 1, "Component/t1/count": 1, "Component/t1/max": 1, "Component/t1/mean_rate": 1, ' \
-                   '"Component/t1/min": 1, "Component/t1/std_dev": 0, "Component/t1/sum": 1}, "name": "foo"}]}' % (
-                       socket.gethostname(), os.getpid())
+        expected = '{"agent": {"host": "%s", "pid": %s, "version": "0.3.2"}, "components": [{"duration": 1, "guid": "com.github.pyformance", "metrics": {"Component/t1": {' \
+                   '"count": 1, "max": 1, "min": 1, "sum_of_squares": 1, "total": 1}}, "name": "foo"}]}' % (socket.gethostname(), os.getpid())
+
         self.assertEqual(expected.replace(".0", ""), output.replace(".0", ""))

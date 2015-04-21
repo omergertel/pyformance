@@ -4,6 +4,7 @@ import json
 import os
 import socket
 import sys
+from pyformance.registry import set_global_registry, MetricsRegistry
 
 if sys.version_info[0] > 2:
     import urllib.request as urllib
@@ -18,6 +19,32 @@ from .reporter import Reporter
 
 DEFAULT_CARBON_SERVER = '0.0.0.0'
 DEFAULT_CARBON_PORT = 2003
+
+
+class NewRelicSink(object):
+
+    def __init__(self):
+        self.total = 0
+        self.count = 0
+        self.min = None
+        self.max = None
+        self.sum_of_squares = 0
+
+    def add(self, seconds):
+        self.total += seconds
+        self.count += 1
+        self.sum_of_squares += seconds * seconds
+        self.min = min(self.min, seconds) if self.min else seconds
+        self.max = max(self.max, seconds) if self.max else seconds
+        pass
+
+
+class NewRelicRegistry(MetricsRegistry):
+    def create_sink(self):
+        return NewRelicSink()
+
+
+set_global_registry(NewRelicRegistry())
 
 
 class NewRelicReporter(Reporter):
@@ -65,13 +92,25 @@ class NewRelicReporter(Reporter):
                 'pid': os.getpid(),
                 'version': __version__}
 
-    def create_metrics(self, input):
+    def create_metrics(self, registry):
         results = {}
-        for key in input.keys():
+        # noinspection PyProtectedMember
+        timers = registry._timers
+        for key in timers:
+            sink = timers[key].sink
 
-            for value_key in input[key].keys():
-                full_key = 'Component/%s%s/%s' % (self.prefix, key, value_key)
-                results[full_key.replace('.', '/')] = input[key][value_key]
+            if not sink.count:
+                continue
+
+            full_key = 'Component/%s%s' % (self.prefix, key)
+            results[full_key.replace('.', '/')] = {
+                "total": sink.total,
+                "count": sink.count,
+                "min": sink.min,
+                "max": sink.max,
+                "sum_of_squares": sink.sum_of_squares
+            }
+            sink.__init__()
         return results
 
     def collect_metrics(self, registry):
@@ -81,7 +120,7 @@ class NewRelicReporter(Reporter):
                 'guid': 'com.github.pyformance',
                 'name': self.name,
                 'duration': self.reporting_interval,
-                'metrics': self.create_metrics(registry.dump_metrics())
+                'metrics': self.create_metrics(registry)
             }]
         }
 

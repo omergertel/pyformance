@@ -21,10 +21,11 @@ class Timer(object):
       
     """
 
-    def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time):
+    def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sink=None):
         super(Timer, self).__init__()
         self.meter = Meter(clock=clock)
         self.hist = Histogram(clock=clock)
+        self.sink = sink
         self.threshold = threshold
 
     def get_count(self):
@@ -79,6 +80,8 @@ class Timer(object):
         if seconds >= 0:
             self.hist.add(seconds)
             self.meter.mark()
+            if self.sink:
+                self.sink.add(seconds)
 
     def time(self, *args, **kwargs):
         """
