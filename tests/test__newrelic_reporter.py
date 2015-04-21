@@ -1,8 +1,7 @@
 import os
 import socket
-from pyformance.registry import meter_calls
-from pyformance.reporters.newrelic_reporter import NewRelicReporter
 
+from pyformance.reporters.newrelic_reporter import NewRelicReporter
 from pyformance import MetricsRegistry
 from tests import TimedTestCase
 
@@ -19,7 +18,7 @@ class TestNewRelicReporter(TimedTestCase):
     def test_report_now(self):
         r = NewRelicReporter(
             'license_key',
-            registry=self.registry, reporting_interval=1, clock=self.clock)
+            registry=self.registry, reporting_interval=1, clock=self.clock, name='foo')
         h1 = self.registry.histogram("hist")
         for i in range(10):
             h1.add(2 ** i)
@@ -41,6 +40,6 @@ class TestNewRelicReporter(TimedTestCase):
                    '"Component/m1/5m_rate": 0, "Component/m1/count": 1, "Component/m1/mean_rate": 1, "Component/t1/15m_rate": 0, "Component/t1/1m_rate": 0, ' \
                    '"Component/t1/5m_rate": 0, "Component/t1/75_percentile": 1, "Component/t1/95_percentile": 1, "Component/t1/999_percentile": 1, ' \
                    '"Component/t1/99_percentile": 1, "Component/t1/avg": 1, "Component/t1/count": 1, "Component/t1/max": 1, "Component/t1/mean_rate": 1, ' \
-                   '"Component/t1/min": 1, "Component/t1/std_dev": 0, "Component/t1/sum": 1}, "name": "%s"}]}' % (
-                       socket.gethostname(), os.getpid(), socket.gethostname())
+                   '"Component/t1/min": 1, "Component/t1/std_dev": 0, "Component/t1/sum": 1}, "name": "foo"}]}' % (
+                       socket.gethostname(), os.getpid())
         self.assertEqual(expected.replace(".0", ""), output.replace(".0", ""))

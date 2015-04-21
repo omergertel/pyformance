@@ -28,10 +28,11 @@ class NewRelicReporter(Reporter):
     MAX_METRICS_PER_REQUEST = 10000
     PLATFORM_URL = 'https://platform-api.newrelic.com/platform/v1/metrics'
 
-    def __init__(self, license_key, registry=None, reporting_interval=5, prefix="",
+    def __init__(self, license_key, registry=None, name=socket.gethostname(), reporting_interval=5, prefix="",
                  clock=None):
         super(NewRelicReporter, self).__init__(
             registry, reporting_interval, clock)
+        self.name = name
         self.prefix = prefix
 
         self.http_headers = {'Accept': 'application/json',
@@ -77,11 +78,11 @@ class NewRelicReporter(Reporter):
         body = {
             'agent': self.agent_data,
             'components': [{
-                               'guid': 'com.github.pyformance',
-                               'name': socket.gethostname(),
-                               'duration': self.reporting_interval,
-                               'metrics': self.create_metrics(registry.dump_metrics())
-                           }]
+                'guid': 'com.github.pyformance',
+                'name': self.name,
+                'duration': self.reporting_interval,
+                'metrics': self.create_metrics(registry.dump_metrics())
+            }]
         }
 
         return json.dumps(body, ensure_ascii=False, sort_keys=True)
