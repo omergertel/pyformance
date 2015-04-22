@@ -45,7 +45,7 @@ class MetricsRegistry(object):
             if isinstance(metric, cls):
                 if key in registry:
                     raise LookupError("Metric %r already registered" % key)
-                registry[key] = registry
+                registry[key] = metric
                 return
         raise TypeError("Invalid class. Could not register metric %r" % key)
 
