@@ -55,7 +55,7 @@ class TestCarbonReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         r.report_now()
-        self.assertEqual(self.output.getvalue().splitlines().sort(), [
+        self.assertEqual([
             'counter-2.count -2 1',
             'c1.count 1 1',
             'gsimple.value 42 1',
@@ -87,7 +87,8 @@ class TestCarbonReporter(TimedTestCase):
             'm1.15m_rate 0 1',
             'm1.5m_rate 0 1',
             'm1.mean_rate 1.0 1',
-        ].sort())
+        ].sort(),
+            self.output.getvalue().splitlines().sort())
 
 
 if __name__ == "__main__":

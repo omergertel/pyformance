@@ -26,3 +26,8 @@ def ConsoleReporter(*args, **kwargs):
 def CsvReporter(*args, **kwargs):
     from .csv_reporter import CsvReporter as cls
     return cls(*args, **kwargs)
+
+
+def NewRelicReporter(*args, **kwargs):
+    from .newrelic_reporter import NewRelicReporter as cls
+    return cls(*args, **kwargs)

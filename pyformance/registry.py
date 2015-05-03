@@ -100,6 +100,9 @@ class MetricsRegistry(object):
             self._meters[key] = Meter(clock=self._clock)
         return self._meters[key]
 
+    def create_sink(self):
+        return None
+
     def timer(self, key):
         """
         Gets a timer based on a key, creates a new one if it does not exist.
@@ -110,7 +113,7 @@ class MetricsRegistry(object):
         :return: L{Timer}
         """
         if key not in self._timers:
-            self._timers[key] = Timer(clock=self._clock)
+            self._timers[key] = Timer(clock=self._clock, sink=self.create_sink())
         return self._timers[key]
 
     def clear(self):
