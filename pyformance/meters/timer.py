@@ -24,7 +24,7 @@ class Timer(object):
     def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sink=None):
         super(Timer, self).__init__()
         self.meter = Meter(clock=clock)
-        self.hist = Histogram(clock=clock)
+        self.hist = Histogram(size=size, alpha=alpha, clock=clock)
         self.sink = sink
         self.threshold = threshold
 
