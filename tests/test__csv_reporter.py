@@ -9,13 +9,14 @@ else:
 
 from pyformance import MetricsRegistry
 from pyformance.reporters.csv_reporter import CsvReporter
-from tests import TimedTestCase
+from tests import ManualClock, TimedTestCase
 
 
 class TestCsvReporter(TimedTestCase):
 
     def setUp(self):
         super(TestCsvReporter, self).setUp()
+        self.clock = ManualClock()
         self.path = tempfile.mktemp()
         self.registry = MetricsRegistry(clock=self.clock)
         self.maxDiff = None
