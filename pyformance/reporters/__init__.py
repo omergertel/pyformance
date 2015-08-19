@@ -31,3 +31,8 @@ def CsvReporter(*args, **kwargs):
 def NewRelicReporter(*args, **kwargs):
     from .newrelic_reporter import NewRelicReporter as cls
     return cls(*args, **kwargs)
+
+
+def InfluxReporter(*args, **kwargs):
+    from .influx import InfluxReporter as cls
+    return cls(*args, **kwargs)

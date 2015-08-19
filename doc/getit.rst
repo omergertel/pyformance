@@ -8,3 +8,5 @@ The package is available on the Python packaging index (pypi).
     pip install pyformance
  
 
+
+The source repository is on GitHub: https://github.com/omergertel/pyformance
