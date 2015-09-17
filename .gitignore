@@ -3,3 +3,4 @@ pyformance.egg-info
 /.tox/
 /build/
 /dist/
+*.py[cod]
