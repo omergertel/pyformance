@@ -176,6 +176,7 @@ class MetricsRegistry(object):
                    "5m_rate": timer.get_five_minute_rate(),
                    "1m_rate": timer.get_one_minute_rate(),
                    "mean_rate": timer.get_mean_rate(),
+                   "50_percentile": snapshot.get_median(),
                    "75_percentile": snapshot.get_75th_percentile(),
                    "95_percentile": snapshot.get_95th_percentile(),
                    "99_percentile": snapshot.get_99th_percentile(),
