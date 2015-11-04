@@ -18,13 +18,14 @@ class Timer(object):
     """
     A timer metric which aggregates timing durations and provides duration statistics, plus
     throughput statistics via Meter and Histogram.
-      
+
     """
 
-    def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sink=None):
+    def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA,
+                 clock=time, sink=None, sample=None):
         super(Timer, self).__init__()
         self.meter = Meter(clock=clock)
-        self.hist = Histogram(size=size, alpha=alpha, clock=clock)
+        self.hist = Histogram(size=size, alpha=alpha, clock=clock, sample=sample)
         self.sink = sink
         self.threshold = threshold
 
