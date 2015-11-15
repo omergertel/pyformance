@@ -47,6 +47,20 @@ using the HTTP Interface.
 	histogram.add(10)
 	histogram.add(25)
 
+### Carbon Reporter
+A simple call which will periodically push out your metrics to graphite using the Carbon TCP Interface (line protocol).
+
+    registry = MetricsRegistry()	
+    #Push metrics contained in registry to graphite every 10s
+    reporter = CarbonReporter(registry, reporting_interval=10, prefix="my-host", server="graphite-host", port=2003)
+    reporter.start()
+    
+    # Some time later we increment metrics
+    histogram = registry.histogram("test.histogram")
+    histogram.add(0)
+	histogram.add(10)
+	histogram.add(25)
+
 ## Examples
 ### Decorators
 The simplest and easiest way to use the PyFormance library.
