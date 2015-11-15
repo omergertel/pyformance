@@ -110,3 +110,38 @@ class ExpDecayingSample(object):
 
     def get_snapshot(self):
         return Snapshot(self.values.values())
+
+
+class SlidingTimeWindowSample(object):
+
+    """
+    A sample of measurements made in a sliding time window.
+    """
+
+    DEFAULT_WINDOW = 300
+
+    def __init__(self, window=DEFAULT_WINDOW, clock=time):
+        """Creates a SlidingTimeWindowSample.
+
+        :param window: the length of the time window in seconds
+        :param clock: clock.time() is called to get the current time as seconds
+                      since the epoch.
+        """
+        self.window = window
+        self.clock = clock
+        self.clear()
+
+    def clear(self):
+        self.values = []
+
+    def _trim(self):
+        deadline = self.clock.time() - self.window
+        while self.values and self.values[0][0] < deadline:
+            heapq.heappop(self.values)
+
+    def update(self, value):
+        heapq.heappush(self.values, (self.clock.time(), value))
+
+    def get_snapshot(self):
+        self._trim()
+        return Snapshot(x[1] for x in self.values)

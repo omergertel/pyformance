@@ -41,7 +41,7 @@ class HistogramTestCase(TimedTestCase):
         self.assertAlmostEqual(9.1666, hist.get_var(), delta=0.0001)
 
     def test__a_long_wait_should_not_corrupt_sample(self):
-        hist = Histogram(10, 0.015, self.clock)
+        hist = Histogram(10, 0.015, clock=self.clock)
 
         for i in range(1000):
             hist.add(1000 + i)

@@ -10,20 +10,23 @@ class Histogram(object):
     A metric which calculates the distribution of a value.
     """
 
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time):
+    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time,
+                 sample=None):
         """
         Creates a new instance of a L{Histogram}.
         """
         super(Histogram, self).__init__()
         self.lock = Lock()
         self.clock = clock
-        self.sample = ExpDecayingSample(size, alpha, clock)
+        if sample is None:
+            sample = ExpDecayingSample(size, alpha, clock)
+        self.sample = sample
         self.clear()
 
     def add(self, value):
         """
         Add value to histogram
-        
+
         :type value: float
         """
         with self.lock:
