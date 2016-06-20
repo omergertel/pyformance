@@ -1,8 +1,8 @@
-# PyFormance
+#PyFormance
 
     pip install pyformance
 
-A Python port of the core portion of a [Java Metrics library by Coda Hale](http://metrics.codahale.com/), with inspiration by [YUNOMI - Y U NO MEASURE IT?](https://github.com/richzeng/yunomi)
+A Python port of the core portion of a [Java Metrics library by Coda Hale](http://metrics.dropwizard.io/), with inspiration by [YUNOMI - Y U NO MEASURE IT?](https://github.com/richzeng/yunomi)
 
 PyFormance is a toolset for performance measurement and statistics, with a signaling mechanism that allows to issue events in cases of unexpected behavior
 
