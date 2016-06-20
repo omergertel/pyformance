@@ -45,4 +45,12 @@ Reporters
    :members:
 
 
+.. automodule:: pyformance.reporters.newrelic_reporter
+   :members:
+
+
+.. automodule:: pyformance.reporters.influx
+   :members:
+
+
 

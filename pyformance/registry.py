@@ -250,8 +250,8 @@ class RegexRegistry(MetricsRegistry):
     def counter(self, key):
         return super(RegexRegistry, self).counter(self._get_key(key))
 
-    def gauge(self, key, gauge=None):
-        return super(RegexRegistry, self).gauge(self._get_key(key), gauge)
+    def gauge(self, key, gauge=None, default=float("nan")):
+        return super(RegexRegistry, self).gauge(self._get_key(key), gauge, default)
 
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
