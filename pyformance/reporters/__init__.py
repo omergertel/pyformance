@@ -36,3 +36,8 @@ def NewRelicReporter(*args, **kwargs):
 def InfluxReporter(*args, **kwargs):
     from .influx import InfluxReporter as cls
     return cls(*args, **kwargs)
+
+
+def OpenTSDBReporter(*args, **kwargs):
+    from .opentsdb_reporter import OpenTSDBReporter as cls
+    return cls(*args, **kwargs)

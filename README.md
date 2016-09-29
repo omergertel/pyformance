@@ -60,6 +60,19 @@ A simple call which will periodically push out your metrics to graphite using th
     histogram.add(0)
 	histogram.add(10)
 	histogram.add(25)
+	
+### OpenTSDB Reporter
+Declare a reporter to push your metrics to the OpenTSDB API
+
+    registry = MetricsRegistry()	
+    reporter = OpenTSDBReporter(registry=registry,
+                                reporting_interval=10,
+                                prefix="my-host",
+                                url="http://opentsdb.com/api/put",
+                                application_name="appname",
+                                write_key="writekey")
+    reporter.start()
+
 
 ## Examples
 ### Decorators
