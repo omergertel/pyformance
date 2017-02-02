@@ -78,6 +78,7 @@ class TestCarbonReporter(TimedTestCase):
             'hist.min 1 2',
             'hist.95_percentile 512 2',
             'hist.75_percentile 160.0 2',
+            'hist.50_percentile 24.0 2',
             'hist.std_dev 164.94851048466947 2' \
                 if PY3 else 'hist.std_dev 164.948510485 2',
             'hist.max 512 2',
@@ -123,6 +124,7 @@ class TestCarbonReporter(TimedTestCase):
             ('hist.min', (2, 1)),
             ('hist.95_percentile', (2, 512.0)),
             ('hist.75_percentile', (2, 160.0)),
+            ('hist.50_percentile', (2, 24.0)),
             ('hist.std_dev', (2, 164.94851048466947)),
             ('hist.max', (2, 512.0)),
             ('hist.avg', (2, 102.3)),
