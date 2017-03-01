@@ -42,7 +42,6 @@ class TestSysLogReporter(TimedTestCase):
  
             patch.assert_called_with(expected)
 
-        r.report_now()
 
 if __name__ == "__main__":
     unittest.main()
