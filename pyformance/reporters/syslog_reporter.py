@@ -16,7 +16,7 @@ DEFAULT_SYSLOG_FACILITY = logging.handlers.SysLogHandler.LOG_USER
 class SysLogReporter(Reporter):
 
     """
-    Carbon is the network daemon to collect metrics for Graphite
+    Syslog is a way for network devices to send event messages to a logging server
     """
 
     def __init__(self, registry=None, reporting_interval=5, tag="pyformance", clock=None,
