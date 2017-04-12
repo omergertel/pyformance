@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
-import urllib2
+
 import base64
 import logging
+try:
+    from urllib2 import quote, urlopen, Request, URLError
+except ImportError:
+    from urllib.error import URLError
+    from urllib.parse import quote
+    from urllib.request import urlopen, Request
 
 from .reporter import Reporter
 
@@ -40,24 +46,22 @@ class InfluxReporter(Reporter):
         self.autocreate_database = autocreate_database
         self._did_create_database = False
 
-
     def _create_database(self):
         url = "%s://%s:%s/query" % (self.protocol, self.server, self.port)
-        q = urllib2.quote("CREATE DATABASE %s" % self.database)
-        request = urllib2.Request(url + "?q=" + q)
+        q = quote("CREATE DATABASE %s" % self.database)
+        request = Request(url + "?q=" + q)
         if self.username:
             auth = base64.encodestring(
                 '%s:%s' % (self.username, self.password))[:-1]
             request.add_header("Authorization", "Basic %s" % auth)
         try:
-            response = urllib2.urlopen(request)
+            response = urlopen(request)
             _result = response.read()
             # Only set if we actually were able to get a successful response
             self._did_create_database = True
-        except urllib2.URLError, err:
-            LOG.warning("Cannot create database %s to %s: %s" %
-                               (self.database, self.server, err.reason))
-
+        except URLError as err:
+            LOG.warning("Cannot create database %s to %s: %s",
+                        self.database, self.server, err.reason)
 
     def report_now(self, registry=None, timestamp=None):
         if self.autocreate_database and not self._did_create_database:
@@ -77,14 +81,14 @@ class InfluxReporter(Reporter):
         post_data = "\n".join(post_data)
         path = "/write?db=%s&precision=s" % self.database
         url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
-        request = urllib2.Request(url, post_data)
+        request = Request(url, post_data)
         if self.username:
             auth = base64.encodestring(
                 '%s:%s' % (self.username, self.password))[:-1]
             request.add_header("Authorization", "Basic %s" % auth)
         try:
-            response = urllib2.urlopen(request)
+            response = urlopen(request)
             _result = response.read()
-        except urllib2.URLError, err:
-            LOG.warning("Cannot write to %s: %s" %
-                               (self.server, err.reason))
+        except URLError as err:
+            LOG.warning("Cannot write to %s: %s",
+                        self.server, err.reason)
