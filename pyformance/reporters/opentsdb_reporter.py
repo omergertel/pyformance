@@ -33,7 +33,8 @@ class OpenTSDBReporter(Reporter):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             try:
-                request = urllib.Request(self.url, data=json.dumps(metrics),
+                request = urllib.Request(self.url,
+                                         data=self._format_data_string_for_urllib(json.dumps(metrics)),
                                          headers={'content-type': "application/json"})
                 authentication_data = "{0}:{1}".format(self.application_name, self.write_key)
                 auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8")))
@@ -55,3 +56,9 @@ class OpenTSDBReporter(Reporter):
                     'tags': self.tags,
                 })
         return metrics_data
+
+    @staticmethod
+    def _format_data_string_for_urllib(data):
+        if sys.version_info[0] > 2:
+            return data.encode("utf-8")
+        return data
