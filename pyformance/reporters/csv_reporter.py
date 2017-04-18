@@ -47,3 +47,11 @@ class CsvReporter(Reporter):
                 cols.append(values[vk])
             f.write("%s\n" % self.separator.join(map(str, cols)))
             f.flush()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        for f in self.files.values():
+            f.close()
+
