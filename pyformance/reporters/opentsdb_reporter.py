@@ -33,7 +33,8 @@ class OpenTSDBReporter(Reporter):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             try:
-                request = urllib.Request(self.url, data=json.dumps(metrics),
+                request = urllib.Request(self.url,
+                                         data=json.dumps(metrics).encode("utf-8"),
                                          headers={'content-type': "application/json"})
                 authentication_data = "{0}:{1}".format(self.application_name, self.write_key)
                 auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8")))
@@ -55,3 +56,4 @@ class OpenTSDBReporter(Reporter):
                     'tags': self.tags,
                 })
         return metrics_data
+
