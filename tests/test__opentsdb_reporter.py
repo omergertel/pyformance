@@ -33,7 +33,7 @@ class TestOpenTSDBReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         output = r._collect_metrics(registry=self.registry)
-        self.assertEqual(len(output), 31)
+        self.assertEqual(len(output), 32)
         for data in output:
             assert data['metric'].startswith("prefix.")
 

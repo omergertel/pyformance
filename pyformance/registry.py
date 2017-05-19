@@ -144,6 +144,7 @@ class MetricsRegistry(object):
                    "max": histogram.get_max(),
                    "min": histogram.get_min(),
                    "std_dev": histogram.get_stddev(),
+                   "50_percentile": snapshot.get_median(),
                    "75_percentile": snapshot.get_75th_percentile(),
                    "95_percentile": snapshot.get_95th_percentile(),
                    "99_percentile": snapshot.get_99th_percentile(),
