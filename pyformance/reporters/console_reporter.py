@@ -19,8 +19,7 @@ class ConsoleReporter(Reporter):
 
     def report_now(self, registry=None, timestamp=None):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
-        for line in metrics:
-            print(line, file=self.stream)
+        print(metrics, file=self.stream)
 
     def _collect_metrics(self, registry, timestamp=None):
         timestamp = timestamp or int(round(self.clock.time()))
