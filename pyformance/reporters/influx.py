@@ -69,19 +69,19 @@ class InfluxReporter(Reporter):
         timestamp = timestamp or int(round(self.clock.time()))
         metrics = (registry or self.registry).dump_metrics()
         post_data = []
-        for key, metric_values in metrics.iteritems():
+        for key, metric_values in metrics.items():
             if not self.prefix:
                 table = key
             else:
                 table = "%s.%s" % (self.prefix, key)
             values = ",".join(["%s=%s" % (k, v)
-                              for (k, v) in metric_values.iteritems()])
+                              for (k, v) in metric_values.items()])
             line = "%s %s %s" % (table, values, timestamp)
             post_data.append(line)
         post_data = "\n".join(post_data)
         path = "/write?db=%s&precision=s" % self.database
         url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
-        request = Request(url, post_data)
+        request = Request(url, post_data.encode("utf-8"))
         if self.username:
             auth = base64.encodestring(
                 '%s:%s' % (self.username, self.password))[:-1]
