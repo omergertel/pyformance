@@ -74,7 +74,8 @@ class InfluxReporter(Reporter):
                 table = key
             else:
                 table = "%s.%s" % (self.prefix, key)
-            values = ",".join(["%s=%s" % (k, v)
+            values = ",".join(["%s=%s" % (k, v if type(v) is not str \
+                                               else '"{}"'.format(v))
                               for (k, v) in metric_values.items()])
             line = "%s %s %s" % (table, values, timestamp)
             post_data.append(line)
