@@ -20,7 +20,6 @@ DEFAULT_INFLUX_USERNAME = None
 DEFAULT_INFLUX_PASSWORD = None
 DEFAULT_INFLUX_PROTOCOL = "http"
 
-
 class InfluxReporter(Reporter):
 
     """
@@ -51,9 +50,8 @@ class InfluxReporter(Reporter):
         q = quote("CREATE DATABASE %s" % self.database)
         request = Request(url + "?q=" + q)
         if self.username:
-            auth = base64.encodestring(
-                '%s:%s' % (self.username, self.password))[:-1]
-            request.add_header("Authorization", "Basic %s" % auth)
+            auth = _encode_username(self.username, self.password)
+            request.add_header("Authorization", "Basic %s" % auth.decode('utf-8'))
         try:
             response = urlopen(request)
             _result = response.read()
@@ -84,12 +82,16 @@ class InfluxReporter(Reporter):
         url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
         request = Request(url, post_data.encode("utf-8"))
         if self.username:
-            auth = base64.encodestring(
-                '%s:%s' % (self.username, self.password))[:-1]
-            request.add_header("Authorization", "Basic %s" % auth)
+            auth = _encode_username(self.username, self.password)
+            request.add_header("Authorization", "Basic %s" % auth.decode('utf-8'))
         try:
             response = urlopen(request)
-            _result = response.read()
+            response.read()
         except URLError as err:
             LOG.warning("Cannot write to %s: %s",
                         self.server, err.reason)
+
+
+def _encode_username(username, password):
+    auth_string = ('%s:%s' % (username, password)).encode()
+    return base64.b64encode(auth_string)
