@@ -40,11 +40,14 @@ class CarbonReporter(Reporter):
         timestamp = timestamp or int(round(self.clock.time()))
         metrics = registry.dump_metrics()
         if self.pickle_protocol:
-            payload = pickle.dumps([
-                ("%s%s.%s" % (self.prefix, metric_name, metic_key), (timestamp, metric_value))
-                for metric_name, metric in iteritems(metrics)
-                for metic_key, metric_value in iteritems(metric)
-            ])
+            payload = pickle.dumps(
+                [
+                    ("%s%s.%s" % (self.prefix, metric_name, metic_key), (timestamp, metric_value))
+                    for metric_name, metric in iteritems(metrics)
+                    for metic_key, metric_value in iteritems(metric)
+                ],
+                protocol=2
+            )
             header = struct.pack("!L", len(payload))
             return header + payload
         else:
