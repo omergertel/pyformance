@@ -36,12 +36,14 @@ class Reporter(object):
         self._stopped.set()
 
     def _loop(self):
+        next_loop_time = time.time()
         while not self._stopped.is_set():
             try:
                 self.report_now(self.registry)
             except:
                 pass
-            time.sleep(self.reporting_interval)
+            next_loop_time += self.reporting_interval
+            time.sleep(max(0, next_loop_time - time.time()))
         # self._stopped.clear()
 
     def report_now(self, registry=None, timestamp=None):
