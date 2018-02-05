@@ -54,9 +54,9 @@ class CarbonReporter(Reporter):
             metrics_data = []
             for metric_name, metric in iteritems(metrics):
                 for metric_key, metric_value in iteritems(metric):
-                    metricLine = "%s%s.%s %s %s\n" % (
+                    metric_line = "%s%s.%s %s %s\n" % (
                         self.prefix, metric_name, metric_key, metric_value, timestamp)
-                    metrics_data.append(metricLine)
+                    metrics_data.append(metric_line)
             result = ''.join(metrics_data)
             if sys.version_info[0] > 2:
                 return result.encode()
