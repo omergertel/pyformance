@@ -34,28 +34,28 @@ class Timer(object):
         return self.hist.get_count()
 
     def get_sum(self):
-        "get sum from internal histogram"
-        return self.hist.get_sum()
+        "get sum from snapshot of internal histogram"
+        return self.get_snapshot().get_sum()
 
     def get_max(self):
-        "get max from internal histogram"
-        return self.hist.get_max()
+        "get max from snapshot of internal histogram"
+        return self.get_snapshot().get_max()
 
     def get_min(self):
-        "get min from internal histogram"
-        return self.hist.get_min()
+        "get min from snapshot of internal histogram"
+        return self.get_snapshot().get_min()
 
     def get_mean(self):
-        "get mean from internal histogram"
-        return self.hist.get_mean()
+        "get mean from snapshot of internal histogram"
+        return self.get_snapshot().get_mean()
 
     def get_stddev(self):
-        "get stddev from internal histogram"
-        return self.hist.get_stddev()
+        "get stddev from snapshot of internal histogram"
+        return self.get_snapshot().get_stddev()
 
     def get_var(self):
-        "get var from internal histogram"
-        return self.hist.get_var()
+        "get var from snapshot of internal histogram"
+        return self.get_snapshot().get_var()
 
     def get_snapshot(self):
         "get snapshot from internal histogram"

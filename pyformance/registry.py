@@ -139,11 +139,11 @@ class MetricsRegistry(object):
         if key in self._histograms:
             histogram = self._histograms[key]
             snapshot = histogram.get_snapshot()
-            res = {"avg": histogram.get_mean(),
+            res = {"avg": snapshot.get_mean(),
                    "count": histogram.get_count(),
-                   "max": histogram.get_max(),
-                   "min": histogram.get_min(),
-                   "std_dev": histogram.get_stddev(),
+                   "max": snapshot.get_max(),
+                   "min": snapshot.get_min(),
+                   "std_dev": snapshot.get_stddev(),
                    "75_percentile": snapshot.get_75th_percentile(),
                    "95_percentile": snapshot.get_95th_percentile(),
                    "99_percentile": snapshot.get_99th_percentile(),
