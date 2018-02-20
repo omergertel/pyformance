@@ -65,7 +65,7 @@ class TestConsoleReporter(TimedTestCase):
                          '                 min = 1',
                          '       95_percentile = 512',
                          '       75_percentile = 160.0',
-                         '             std_dev = 164.948510485',
+                         '             std_dev = 164.94851048466944',
                          '                 max = 512',
                          '                 avg = 102.3',
                          'm1:', '               count = 1.0',

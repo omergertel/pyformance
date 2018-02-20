@@ -1,3 +1,6 @@
+import math
+
+
 class Snapshot(object):
 
     """
@@ -17,6 +20,42 @@ class Snapshot(object):
     def get_size(self):
         "get current size"
         return len(self.values)
+
+    def get_sum(self):
+        "get current sum"
+        return float(sum(self.values))
+
+    def get_max(self):
+        "get current maximum value"
+        if not self.values:
+            return 0
+        return self.values[-1]
+
+    def get_min(self):
+        "get current minimum value"
+        if not self.values:
+            return 0
+        return self.values[0]
+
+    def get_mean(self):
+        "get current mean value"
+        if not self.values:
+            return 0
+        return float(sum(self.values)) / self.get_size()
+
+    def get_stddev(self):
+        "get current standard deviation"
+        if not self.values:
+            return 0
+        return math.sqrt(self.get_var())
+
+    def get_var(self):
+        "get current variance"
+        if not self.values or self.get_size() == 1:
+            return 0
+        mean = self.get_mean()
+        square_differences = [(mean - value) ** 2 for value in self.values]
+        return sum(square_differences) / (self.get_size() - 1)
 
     def get_median(self):
         "get current median"
