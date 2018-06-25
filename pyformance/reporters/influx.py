@@ -2,12 +2,8 @@
 
 import base64
 import logging
-try:
-    from urllib2 import quote, urlopen, Request, URLError
-except ImportError:
-    from urllib.error import URLError
-    from urllib.parse import quote
-    from urllib.request import urlopen, Request
+
+from six.moves import urllib
 
 from .reporter import Reporter
 
@@ -47,17 +43,17 @@ class InfluxReporter(Reporter):
 
     def _create_database(self):
         url = "%s://%s:%s/query" % (self.protocol, self.server, self.port)
-        q = quote("CREATE DATABASE %s" % self.database)
-        request = Request(url + "?q=" + q)
+        q = urllib.parse.quote("CREATE DATABASE %s" % self.database)
+        request = urllib.request.Request(url + "?q=" + q)
         if self.username:
             auth = _encode_username(self.username, self.password)
             request.add_header("Authorization", "Basic %s" % auth.decode('utf-8'))
         try:
-            response = urlopen(request)
+            response = urllib.request.urlopen(request)
             _result = response.read()
             # Only set if we actually were able to get a successful response
             self._did_create_database = True
-        except URLError as err:
+        except urllib.error.URLError as err:
             LOG.warning("Cannot create database %s to %s: %s",
                         self.database, self.server, err.reason)
 
@@ -80,14 +76,14 @@ class InfluxReporter(Reporter):
         post_data = "\n".join(post_data)
         path = "/write?db=%s&precision=s" % self.database
         url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
-        request = Request(url, post_data.encode("utf-8"))
+        request = urllib.request.Request(url, post_data.encode("utf-8"))
         if self.username:
             auth = _encode_username(self.username, self.password)
             request.add_header("Authorization", "Basic %s" % auth.decode('utf-8'))
         try:
-            response = urlopen(request)
+            response = urllib.request.urlopen(request)
             response.read()
-        except URLError as err:
+        except urllib.error.URLError as err:
             LOG.warning("Cannot write to %s: %s",
                         self.server, err.reason)
 

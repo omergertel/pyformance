@@ -5,12 +5,7 @@ from .reporter import Reporter
 import base64
 import json
 
-if sys.version_info[0] > 2:
-    import urllib.request as urllib
-    import urllib.error as urlerror
-else:
-    import urllib2 as urllib
-    import urllib2 as urlerror
+from six.moves import urllib
 
 
 class OpenTSDBReporter(Reporter):
@@ -33,13 +28,13 @@ class OpenTSDBReporter(Reporter):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             try:
-                request = urllib.Request(self.url,
+                request = urllib.request.Request(self.url,
                                          data=json.dumps(metrics).encode("utf-8"),
                                          headers={'content-type': "application/json"})
                 authentication_data = "{0}:{1}".format(self.application_name, self.write_key)
                 auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8")))
                 request.add_header("Authorization", "Basic {0}".format(auth_header))
-                urllib.urlopen(request)
+                urllib.request.urlopen(request)
             except Exception as e:
                 sys.stderr.write("{0}\n".format(e))
 

@@ -4,15 +4,10 @@ import json
 import os
 import socket
 import sys
+
+from six.moves import urllib
+
 from pyformance.registry import set_global_registry, MetricsRegistry
-
-if sys.version_info[0] > 2:
-    import urllib.request as urllib
-    import urllib.error as urlerror
-else:
-    import urllib2 as urllib
-    import urllib2 as urlerror
-
 from pyformance.__version__ import __version__
 
 from .reporter import Reporter
@@ -36,7 +31,6 @@ class NewRelicSink(object):
         self.sum_of_squares += seconds * seconds
         self.min = min(self.min, seconds) if self.min else seconds
         self.max = max(self.max, seconds) if self.max else seconds
-        pass
 
 
 class NewRelicRegistry(MetricsRegistry):
@@ -72,11 +66,11 @@ class NewRelicReporter(Reporter):
         if metrics:
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
-                request = urllib.Request(self.PLATFORM_URL, metrics.encode() if sys.version_info[0] > 2 else metrics)
+                request = urllib.request.Request(self.PLATFORM_URL, metrics.encode() if sys.version_info[0] > 2 else metrics)
                 for k, v in self.http_headers.items():
                     request.add_header(k, v)
-                result = urllib.urlopen(request)
-                if isinstance(result, urlerror.HTTPError):
+                result = urllib.request.urlopen(request)
+                if isinstance(result, urllib.error.HTTPError):
                     raise result
             except Exception as e:
                 print(e, file=sys.stderr)

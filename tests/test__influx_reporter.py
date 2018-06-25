@@ -1,10 +1,7 @@
 import os
 import mock
 
-try:
-    from urllib2 import Request
-except ImportError:
-    from urllib.request import Request
+from six.moves.urllib.request import Request
 
 from pyformance.reporters.influx import InfluxReporter
 from pyformance import MetricsRegistry
