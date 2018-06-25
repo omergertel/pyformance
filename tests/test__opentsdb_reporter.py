@@ -53,6 +53,6 @@ class TestOpenTSDBReporter(TimedTestCase):
             c2.dec()
             c2.dec()
             self.clock.add(1)
-        with mock.patch("pyformance.reporters.opentsdb_reporter.urllib.urlopen") as patch:
+        with mock.patch("pyformance.reporters.opentsdb_reporter.urllib.request.urlopen") as patch:
             r.report_now()
             patch.assert_called()
