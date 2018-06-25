@@ -11,3 +11,5 @@ Changed and new in fork
 * pass clock attribute from registry to meters (required for reporter-tests)
 * wrote a simple example script which collects system metrics
 * started documentation based on sphinx
+* fix urllib2 import in hosted_graphite_reporter.py
+* using six.moves to handle import between different py version instead of checking for the current version
