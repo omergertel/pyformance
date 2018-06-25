@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import sys
-import urllib2
 import base64
+
+from six.moves import urllib
 
 from .meters import Counter, Histogram, Meter, Timer
 from .registry import MetricsRegistry
@@ -28,10 +29,10 @@ class HostedGraphiteReporter(Reporter):
         if metrics:
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
-                request = urllib2.Request(self.url, metrics)
+                request = urllib.request.Request(self.url, metrics)
                 request.add_header("Authorization", "Basic %s" %
                                    base64.encodestring(self.api_key).strip())
-                result = urllib2.urlopen(request)
+                result = urllib.request.urlopen(request)
             except Exception as e:
                 print(e, file=sys.stderr)
 
