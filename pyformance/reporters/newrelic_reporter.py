@@ -5,7 +5,12 @@ import os
 import socket
 import sys
 
-from six.moves import urllib
+if sys.version_info[0] > 2:
+    import urllib.request as urllib
+    import urllib.error as urlerror
+else:
+    import urllib2 as urllib
+    import urllib2 as urlerror
 
 from pyformance.registry import set_global_registry, MetricsRegistry
 from pyformance.__version__ import __version__
