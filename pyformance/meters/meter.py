@@ -1,6 +1,6 @@
 import time
 from threading import Lock
-from ..stats.moving_average import ExpWeightedMovingAvg
+from pyformance.stats.moving_average import ExpWeightedMovingAvg
 
 
 class Meter(object):

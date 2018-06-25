@@ -2,7 +2,7 @@
 import sys
 import os
 import datetime
-from .reporter import Reporter
+from pyformance.reporters.reporter import Reporter
 
 
 class CsvReporter(Reporter):

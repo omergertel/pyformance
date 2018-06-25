@@ -2,7 +2,7 @@
 from __future__ import print_function
 import sys
 import datetime
-from .reporter import Reporter
+from pyformance.reporters.reporter import Reporter
 
 
 class ConsoleReporter(Reporter):

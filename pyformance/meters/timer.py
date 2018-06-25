@@ -3,8 +3,8 @@ try:
     from blinker import Namespace
 except ImportError:
     Namespace = None
-from .histogram import Histogram, DEFAULT_SIZE, DEFAULT_ALPHA
-from .meter import Meter
+from pyformance.meters.histogram import Histogram, DEFAULT_SIZE, DEFAULT_ALPHA
+from pyformance.meters.meter import Meter
 
 if Namespace is not None:
     timer_signals = Namespace()

@@ -1,7 +1,7 @@
 import time
 import math
 from threading import Lock
-from ..stats. samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
+from pyformance.stats. samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
 
 
 class Histogram(object):

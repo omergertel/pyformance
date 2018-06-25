@@ -5,9 +5,9 @@ import base64
 
 from six.moves import urllib
 
-from .meters import Counter, Histogram, Meter, Timer
-from .registry import MetricsRegistry
-from .reporter import Reporter
+from pyformance.meters import Counter, Histogram, Meter, Timer
+from pyformance.registry import MetricsRegistry
+from pyformance.reporters.reporter import Reporter
 
 
 class HostedGraphiteReporter(Reporter):

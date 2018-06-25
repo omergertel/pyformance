@@ -6,7 +6,7 @@ import logging.handlers
 from six import iteritems
 import json
 
-from .reporter import Reporter
+from pyformance.reporters.reporter import Reporter
 
 DEFAULT_SYSLOG_ADDRESS = '/dev/log'
 DEFAULT_SYSLOG_SOCKTYPE = socket.SOCK_DGRAM

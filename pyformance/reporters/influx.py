@@ -5,7 +5,7 @@ import logging
 
 from six.moves import urllib
 
-from .reporter import Reporter
+from pyformance.reporters.reporter import Reporter
 
 LOG = logging.getLogger(__name__)
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import sys
-from .reporter import Reporter
 import base64
 import json
 
 from six.moves import urllib
+
+from pyformance.reporters.reporter import Reporter
 
 
 class OpenTSDBReporter(Reporter):

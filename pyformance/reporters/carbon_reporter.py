@@ -6,7 +6,7 @@ import pickle
 import contextlib
 from six import iteritems
 
-from .reporter import Reporter
+from pyformance.reporters.reporter import Reporter
 
 DEFAULT_CARBON_SERVER = '0.0.0.0'
 DEFAULT_CARBON_PORT = 2003

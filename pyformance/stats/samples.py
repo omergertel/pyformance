@@ -2,7 +2,7 @@ import time
 import random
 import math
 import heapq
-from .snapshot import Snapshot
+from pyformance.stats.snapshot import Snapshot
 
 DEFAULT_SIZE = 1028
 DEFAULT_ALPHA = 0.015

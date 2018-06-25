@@ -1,6 +1,7 @@
 import time
 from threading import Thread, Event
-from ..registry import global_registry, get_qualname
+
+from pyformance.registry import global_registry, get_qualname
 
 
 class Reporter(object):
