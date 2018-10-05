@@ -5,6 +5,7 @@ import socket
 import time
 import json
 
+import six
 import psutil
 
 from pyformance import global_registry
@@ -20,42 +21,37 @@ class Collector(object):
 
     def collect_disk_io(self, whitelist=[]):
         stats = psutil.disk_io_counters(perdisk=True)
-        for entry, stat in stats.iteritems():
+        for entry, stat in six.iteritems(stats):
             if not whitelist or entry in whitelist:
-                for k, v in stat._asdict().iteritems():
+                for k, v in six.iteritems(stat._asdict()):
                     self.registry.gauge("disk-%s.%s" % (entry, k)).set_value(v)
                     
     def collect_network_io(self, whitelist=[]):
-        stats = psutil.network_io_counters(pernic=True)
-        for entry, stat in stats.iteritems():
+        stats = psutil.net_io_counters(pernic=True)
+        for entry, stat in six.iteritems(stats):
             if not whitelist or entry in whitelist:
-                for k, v in stat._asdict().iteritems():
+                for k, v in six.iteritems(stat._asdict()):
                     self.registry.gauge("nic-%s.%s" % (entry.replace(" ", "_"), k)).set_value(v)
 
     def collect_cpu_times(self, whitelist=[]):
         stats = psutil.cpu_times(percpu=True)
         for entry, stat in enumerate(stats):
             if not whitelist or entry in whitelist:
-                for k, v in stat._asdict().iteritems():
+                for k, v in six.iteritems(stat._asdict()):
                     self.registry.gauge("cpu%d.%s" % (entry, k)).set_value(v)
-
-    def collect_phymem_usage(self):
-        stats = psutil.phymem_usage()
-        for k, v in stats._asdict().iteritems():
-            self.registry.gauge("phymem.%s" % k).set_value(v)
 
     def collect_swap_usage(self):
         stats = psutil.swap_memory()
-        for k, v in stats._asdict().iteritems():
+        for k, v in six.iteritems(stats._asdict()):
             self.registry.gauge("swap.%s" % k).set_value(v)
         
     def collect_virtmem_usage(self):
-        stats = psutil.virtmem_usage()
-        for k, v in stats._asdict().iteritems():
+        stats = psutil.virtual_memory()
+        for k, v in six.iteritems(stats._asdict()):
             self.registry.gauge("virtmem.%s" % k).set_value(v)    
             
     def collect_uptime(self):
-        uptime = int(time.time()) - int(psutil.BOOT_TIME)
+        uptime = int(time.time()) - int(psutil.boot_time())
         self.registry.gauge("uptime").set_value(uptime)
 
     def collect_disk_usage(self, whitelist=[]):
@@ -84,7 +80,6 @@ class Collector(object):
         self.collect_cpu_times()
         self.collect_uptime()
         self.collect_network_io()
-        self.collect_phymem_usage()
         self.collect_virtmem_usage()
         self.collect_swap_usage()
         self.collect_disk_usage()
