@@ -1,20 +1,21 @@
 import time
 import math
 from threading import Lock
+from .base_metric import BaseMetric
 from ..stats.samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
 
 
-class Histogram(object):
+class Histogram(BaseMetric):
 
     """
     A metric which calculates the distribution of a value.
     """
 
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sample=None):
+    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sample=None, tags=None):
         """
         Creates a new instance of a L{Histogram}.
         """
-        super(Histogram, self).__init__()
+        super(Histogram, self).__init__(tags)
         self.lock = Lock()
         self.clock = clock
         if sample is None:

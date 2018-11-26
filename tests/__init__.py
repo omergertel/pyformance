@@ -17,6 +17,9 @@ class ManualClock(object):
     def time(self):
         return self.now
 
+    def time_string(self):
+        return str(int(round(self.time())))
+
 
 class TimedTestCase(unittest.TestCase):
     clock = ManualClock()

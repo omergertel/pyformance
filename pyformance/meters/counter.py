@@ -1,14 +1,15 @@
 from threading import Lock
+from .base_metric import BaseMetric
 
 
-class Counter(object):
+class Counter(BaseMetric):
 
     """
     An incrementing and decrementing metric
     """
 
-    def __init__(self):
-        super(Counter, self).__init__()
+    def __init__(self, tags=None):
+        super(Counter, self).__init__(tags)
         self.lock = Lock()
         self.counter = 0
 

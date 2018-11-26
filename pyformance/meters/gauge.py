@@ -1,4 +1,7 @@
-class Gauge(object):
+from .base_metric import BaseMetric
+
+
+class Gauge(BaseMetric):
 
     """
     A base class for reading of a particular.
@@ -26,9 +29,9 @@ class CallbackGauge(Gauge):
     A Gauge reading for a given callback
     """
 
-    def __init__(self, callback):
+    def __init__(self, callback, tags=None):
         "constructor expects a callable"
-        super(CallbackGauge, self).__init__()
+        super(CallbackGauge, self).__init__(tags)
         self.callback = callback
 
     def get_value(self):
@@ -42,9 +45,9 @@ class SimpleGauge(Gauge):
     A gauge which holds values with simple getter- and setter-interface
     """
 
-    def __init__(self, value=float("nan")):
+    def __init__(self, value=float("nan"), tags=None):
         "constructor accepts initial value"
-        super(SimpleGauge, self).__init__()
+        super(SimpleGauge, self).__init__(tags)
         self._value = value
 
     def get_value(self):

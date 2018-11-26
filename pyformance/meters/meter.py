@@ -1,17 +1,18 @@
 import time
 from threading import Lock
+from .base_metric import BaseMetric
 from ..stats.moving_average import ExpWeightedMovingAvg
 
 
-class Meter(object):
+class Meter(BaseMetric):
 
     """
     A meter metric which measures mean throughput and one-, five-, and fifteen-minute
     exponentially-weighted moving average throughputs.
     """
 
-    def __init__(self, clock=time):
-        super(Meter, self).__init__()
+    def __init__(self, clock=time, tags=None):
+        super(Meter, self).__init__(tags)
         self.lock = Lock()
         self.clock = clock
         self.clear()

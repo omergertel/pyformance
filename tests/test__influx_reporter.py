@@ -1,4 +1,3 @@
-import os
 import mock
 
 try:
@@ -36,3 +35,59 @@ class TestInfluxReporter(TimedTestCase):
                         patch.call_count
                     )
                 )
+
+    def test_gauge_without_tags(self):
+        self.registry.gauge("cpu").set_value(65)
+        influx_reporter = InfluxReporter(
+            registry=self.registry,
+            clock=self.clock,
+            autocreate_database=False
+        )
+
+        with mock.patch.object(influx_reporter, "_try_send",
+                               wraps=influx_reporter._try_send) as send_mock:
+            influx_reporter.report_now()
+
+            expected_url = "http://127.0.0.1:8086/write?db=metrics&precision=s"
+            expected_data = "cpu value=65 " + self.clock.time_string()
+            send_mock.assert_called_once_with(expected_url, expected_data)
+
+    def test_gauge_with_tags(self):
+        tags = {"region": "us - west"}
+        self.registry.gauge(key="cpu", tags=tags).set_value(65)
+        influx_reporter = InfluxReporter(
+            registry=self.registry,
+            clock=self.clock,
+            autocreate_database=False
+        )
+
+        with mock.patch.object(influx_reporter, "_try_send",
+                               wraps=influx_reporter._try_send) as send_mock:
+            influx_reporter.report_now()
+
+            expected_url = "http://127.0.0.1:8086/write?db=metrics&precision=s"
+            expected_data = "cpu,region=us\\ -\\ west value=65 " + \
+                            self.clock.time_string()
+            send_mock.assert_called_once_with(expected_url, expected_data)
+
+    def test_counter_with_tags(self):
+        tags = {"host": "server1"}
+        counter = self.registry.counter(key="cpu", tags=tags)
+
+        for i in range(5):
+            counter.inc(1)
+
+        influx_reporter = InfluxReporter(
+            registry=self.registry,
+            clock=self.clock,
+            autocreate_database=False
+        )
+
+        with mock.patch.object(influx_reporter, "_try_send",
+                               wraps=influx_reporter._try_send) as send_mock:
+            influx_reporter.report_now()
+
+            expected_url = "http://127.0.0.1:8086/write?db=metrics&precision=s"
+            expected_data = "cpu,host=server1 count=5 " + \
+                            self.clock.time_string()
+            send_mock.assert_called_once_with(expected_url, expected_data)

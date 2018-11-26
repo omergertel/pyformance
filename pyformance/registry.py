@@ -50,72 +50,84 @@ class MetricsRegistry(object):
                 return
         raise TypeError("Invalid class. Could not register metric %r" % key)
 
-    def counter(self, key):
+    def counter(self, key, tags=None):
         """
         Gets a counter based on a key, creates a new one if it does not exist.
 
         :param key: name of the metric
         :type key: C{str}
 
+        :param tags: tags attached to the counter (e.g. {'region': 'us-west-1'})
+        :type tags: C{dict}
+
         :return: L{Counter}
         """
         if key not in self._counters:
-            self._counters[key] = Counter()
+            self._counters[key] = Counter(tags=tags)
         return self._counters[key]
 
-    def histogram(self, key):
+    def histogram(self, key, tags=None):
         """
         Gets a histogram based on a key, creates a new one if it does not exist.
 
         :param key: name of the metric
         :type key: C{str}
 
+        :param tags: tags attached to the histogram (e.g. {'region': 'us-west-1'})
+        :type tags: C{dict}
+
         :return: L{Histogram}
         """
         if key not in self._histograms:
-            self._histograms[key] = Histogram(clock=self._clock)
+            self._histograms[key] = Histogram(clock=self._clock, tags=tags)
         return self._histograms[key]
 
-    def gauge(self, key, gauge=None, default=float("nan")):
+    def gauge(self, key, gauge=None, default=float("nan"), tags=None):
         if key not in self._gauges:
             if gauge is None:
                 gauge = SimpleGauge(
-                    default
+                    default, tags
                 )  # raise TypeError("gauge required for registering")
             elif not isinstance(gauge, Gauge):
                 if not callable(gauge):
                     raise TypeError("gauge getter not callable")
-                gauge = CallbackGauge(gauge)
+                gauge = CallbackGauge(gauge, tags)
             self._gauges[key] = gauge
         return self._gauges[key]
 
-    def meter(self, key):
+    def meter(self, key, tags=None):
         """
         Gets a meter based on a key, creates a new one if it does not exist.
 
         :param key: name of the metric
         :type key: C{str}
 
+        :param tags: tags attached to the meter (e.g. {'region': 'us-west-1'})
+        :type tags: C{dict}
+
         :return: L{Meter}
         """
         if key not in self._meters:
-            self._meters[key] = Meter(clock=self._clock)
+            self._meters[key] = Meter(clock=self._clock, tags=tags)
         return self._meters[key]
 
     def create_sink(self):
         return None
 
-    def timer(self, key):
+    def timer(self, key, tags=None):
         """
         Gets a timer based on a key, creates a new one if it does not exist.
 
         :param key: name of the metric
         :type key: C{str}
 
+        :param tags: tags attached to the timer (e.g. {'region': 'us-west-1'})
+        :type tags: C{dict}
+
         :return: L{Timer}
         """
         if key not in self._timers:
-            self._timers[key] = Timer(clock=self._clock, sink=self.create_sink())
+            self._timers[key] = Timer(clock=self._clock, sink=self.create_sink(), tags=tags)
         return self._timers[key]
 
     def clear(self):
@@ -128,13 +140,17 @@ class MetricsRegistry(object):
     def _get_counter_metrics(self, key):
         if key in self._counters:
             counter = self._counters[key]
-            return {"count": counter.get_count()}
+            results = {"count": counter.get_count()}
+            _add_metric_tags_to_metrics(counter, results)
+            return results
         return {}
 
     def _get_gauge_metrics(self, key):
         if key in self._gauges:
             gauge = self._gauges[key]
-            return {"value": gauge.get_value()}
+            result = {"value": gauge.get_value()}
+            _add_metric_tags_to_metrics(gauge, result)
+            return result
         return {}
 
     def _get_histogram_metrics(self, key):
@@ -152,6 +168,7 @@ class MetricsRegistry(object):
                 "99_percentile": snapshot.get_99th_percentile(),
                 "999_percentile": snapshot.get_999th_percentile(),
             }
+            _add_metric_tags_to_metrics(histogram, res)
             return res
         return {}
 
@@ -165,6 +182,7 @@ class MetricsRegistry(object):
                 "1m_rate": meter.get_one_minute_rate(),
                 "mean_rate": meter.get_mean_rate(),
             }
+            _add_metric_tags_to_metrics(meter, res)
             return res
         return {}
 
@@ -189,6 +207,7 @@ class MetricsRegistry(object):
                 "99_percentile": snapshot.get_99th_percentile(),
                 "999_percentile": snapshot.get_999th_percentile(),
             }
+            _add_metric_tags_to_metrics(timer, res)
             return res
         return {}
 
@@ -256,20 +275,25 @@ class RegexRegistry(MetricsRegistry):
         key = "/".join((v for match in matches for v in match.groups() if v))
         return key
 
-    def timer(self, key):
-        return super(RegexRegistry, self).timer(self._get_key(key))
+    def timer(self, key, tags=None):
+        return super(RegexRegistry, self).timer(key=self._get_key(key), tags=tags)
 
-    def histogram(self, key):
-        return super(RegexRegistry, self).histogram(self._get_key(key))
+    def histogram(self, key, tags=None):
+        return super(RegexRegistry, self).histogram(key=self._get_key(key), tags=tags)
 
-    def counter(self, key):
-        return super(RegexRegistry, self).counter(self._get_key(key))
+    def counter(self, key, tags=None):
+        return super(RegexRegistry, self).counter(key=self._get_key(key), tags=tags)
 
-    def gauge(self, key, gauge=None, default=float("nan")):
-        return super(RegexRegistry, self).gauge(self._get_key(key), gauge, default)
+    def gauge(self, key, gauge=None, default=float("nan"), tags=None):
+        return super(RegexRegistry, self).gauge(
+            key=self._get_key(key),
+            gauge=gauge,
+            default=default,
+            tags=tags
+        )
 
-    def meter(self, key):
-        return super(RegexRegistry, self).meter(self._get_key(key))
+    def meter(self, key, tags=None):
+        return super(RegexRegistry, self).meter(key=self._get_key(key), tags=tags)
 
 
 _global_registry = MetricsRegistry()
@@ -284,24 +308,24 @@ def set_global_registry(registry):
     _global_registry = registry
 
 
-def counter(key):
-    return _global_registry.counter(key)
+def counter(key, tags=None):
+    return _global_registry.counter(key, tags)
 
 
-def histogram(key):
-    return _global_registry.histogram(key)
+def histogram(key, tags=None):
+    return _global_registry.histogram(key, tags)
 
 
-def meter(key):
-    return _global_registry.meter(key)
+def meter(key, tags=None):
+    return _global_registry.meter(key, tags)
 
 
-def timer(key):
-    return _global_registry.timer(key)
+def timer(key, tags=None):
+    return _global_registry.timer(key, tags)
 
 
-def gauge(key, gauge=None):
-    return _global_registry.gauge(key, gauge)
+def gauge(key, gauge=None, tags=None):
+    return _global_registry.gauge(key=key, gauge=gauge, tags=tags)
 
 
 def dump_metrics():
@@ -396,3 +420,9 @@ def time_calls(fn):
             return fn(*args, **kwargs)
 
     return wrapper
+
+
+def _add_metric_tags_to_metrics(metric, metrics):
+    tags = metric.get_tags()
+    if tags:
+        metrics["tags"] = tags
