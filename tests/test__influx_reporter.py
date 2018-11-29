@@ -5,7 +5,7 @@ try:
 except ImportError:
     from urllib.request import Request
 
-from pyformance.reporters.influx import InfluxReporter
+from pyformance.reporters.influx import InfluxReporter, _format_tag_value
 from pyformance import MetricsRegistry
 from tests import TimedTestCase
 
@@ -91,3 +91,31 @@ class TestInfluxReporter(TimedTestCase):
             expected_data = "cpu,host=server1 count=5 " + \
                             self.clock.time_string()
             send_mock.assert_called_once_with(expected_url, expected_data)
+
+    def test_count_calls_with_tags(self):
+        tags = {"host": "server1"}
+        counter = self.registry.counter(key="cpu", tags=tags)
+
+        for i in range(5):
+            counter.inc(1)
+
+        influx_reporter = InfluxReporter(
+            registry=self.registry,
+            clock=self.clock,
+            autocreate_database=False
+        )
+
+        with mock.patch.object(influx_reporter, "_try_send",
+                               wraps=influx_reporter._try_send) as send_mock:
+            influx_reporter.report_now()
+
+            expected_url = "http://127.0.0.1:8086/write?db=metrics&precision=s"
+            expected_data = "cpu,host=server1 count=5 " + \
+                            self.clock.time_string()
+            send_mock.assert_called_once_with(expected_url, expected_data)
+
+    def test__format_tag_value(self):
+        self.assertEqual(_format_tag_value("no_special_chars"), "no_special_chars")
+        self.assertEqual(_format_tag_value("has space"), "has\ space")
+        self.assertEqual(_format_tag_value("has,comma"), "has\,comma")
+        self.assertEqual(_format_tag_value("has=equals"), "has\=equals")

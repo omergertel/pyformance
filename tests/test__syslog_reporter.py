@@ -41,8 +41,21 @@ class TestSysLogReporter(TimedTestCase):
             "pyformance.reporters.syslog_reporter.logging.Logger.info"
         ) as patch:
             r.report_now()
-            expected = '{"c1.count": 1, "counter-2.count": -2, "gcb.value": 123, "gsimple.value": 42, "hist.75_percentile": 160.0, "hist.95_percentile": 512, "hist.999_percentile": 512, "hist.99_percentile": 512, "hist.avg": 102.3, "hist.count": 10.0, "hist.max": 512, "hist.min": 1, "hist.std_dev": 164.94851048466944, "m1.15m_rate": 0, "m1.1m_rate": 0, "m1.5m_rate": 0, "m1.count": 1.0, "m1.mean_rate": 1.0, "t1.15m_rate": 0, "t1.1m_rate": 0, "t1.50_percentile": 1, "t1.5m_rate": 0, "t1.75_percentile": 1, "t1.95_percentile": 1, "t1.999_percentile": 1, "t1.99_percentile": 1, "t1.avg": 1.0, "t1.count": 1.0, "t1.max": 1, "t1.mean_rate": 1.0, "t1.min": 1, "t1.std_dev": 0.0, "t1.sum": 1.0, "timestamp": 1}'
-
+            expected = (
+                '{"c1.count": 1, "counter-2.count": -2, '
+                '"gcb.value": 123, "gsimple.value": 42, '
+                '"hist.75_percentile": 160.0, "hist.95_percentile": 512, '
+                '"hist.999_percentile": 512, "hist.99_percentile": 512, '
+                '"hist.avg": 102.3, "hist.count": 10.0, "hist.max": 512, '
+                '"hist.min": 1, "hist.std_dev": 164.94851048466944, '
+                '"m1.15m_rate": 0, "m1.1m_rate": 0, "m1.5m_rate": 0, "m1.count": 1.0, '
+                '"m1.mean_rate": 1.0, "t1.15m_rate": 0, "t1.1m_rate": 0, '
+                '"t1.50_percentile": 1, "t1.5m_rate": 0, "t1.75_percentile": 1, '
+                '"t1.95_percentile": 1, "t1.999_percentile": 1, "t1.99_percentile": 1, '
+                '"t1.avg": 1.0, "t1.count": 1.0, "t1.max": 1, "t1.mean_rate": 1.0, '
+                '"t1.min": 1, "t1.std_dev": 0.0, "t1.sum": 1.0, "timestamp": 1}'
+            )
+ 
             patch.assert_called_with(expected)
 
 

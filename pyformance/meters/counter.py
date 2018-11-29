@@ -8,8 +8,8 @@ class Counter(BaseMetric):
     An incrementing and decrementing metric
     """
 
-    def __init__(self, tags=None):
-        super(Counter, self).__init__(tags)
+    def __init__(self, key, tags=None):
+        super(Counter, self).__init__(key, tags)
         self.lock = Lock()
         self.counter = 0
 

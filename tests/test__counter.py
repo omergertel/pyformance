@@ -5,7 +5,7 @@ from tests import TimedTestCase
 class CounterTestCase(TimedTestCase):
     def setUp(self):
         super(CounterTestCase, self).setUp()
-        self.counter = Counter()
+        self.counter = Counter("test_counter")
 
     def tearDown(self):
         super(CounterTestCase, self).tearDown()

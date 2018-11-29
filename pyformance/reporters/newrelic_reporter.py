@@ -113,7 +113,7 @@ class NewRelicReporter(Reporter):
             if not sink.count:
                 continue
 
-            full_key = "Component/%s%s" % (self.prefix, key)
+            full_key = "Component/%s%s" % (self.prefix, key.get_key())
             results[full_key.replace(".", "/")] = {
                 "total": sink.total,
                 "count": sink.count,

@@ -5,7 +5,7 @@ from tests import TimedTestCase
 class TimerTestCase(TimedTestCase):
     def setUp(self):
         super(TimerTestCase, self).setUp()
-        self.timer = Timer()
+        self.timer = Timer("test_timer")
 
     def tearDown(self):
         super(TimerTestCase, self).tearDown()

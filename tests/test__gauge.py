@@ -6,7 +6,7 @@ class CallbackGaugeTestCase(TimedTestCase):
     def setUp(self):
         super(CallbackGaugeTestCase, self).setUp()
         self._value = None
-        self.gauge = CallbackGauge(self._get_val)
+        self.gauge = CallbackGauge(key="test_gauge", callback=self._get_val)
 
     def tearDown(self):
         super(CallbackGaugeTestCase, self).tearDown()

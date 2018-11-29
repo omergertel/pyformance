@@ -11,8 +11,8 @@ class Meter(BaseMetric):
     exponentially-weighted moving average throughputs.
     """
 
-    def __init__(self, clock=time, tags=None):
-        super(Meter, self).__init__(tags)
+    def __init__(self, key, clock=time, tags=None):
+        super(Meter, self).__init__(key, tags)
         self.lock = Lock()
         self.clock = clock
         self.clear()

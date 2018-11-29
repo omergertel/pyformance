@@ -11,11 +11,19 @@ class Histogram(BaseMetric):
     A metric which calculates the distribution of a value.
     """
 
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sample=None, tags=None):
+    def __init__(
+        self,
+        key,
+        size=DEFAULT_SIZE,
+        alpha=DEFAULT_ALPHA,
+        clock=time,
+        sample=None,
+        tags=None
+    ):
         """
         Creates a new instance of a L{Histogram}.
         """
-        super(Histogram, self).__init__(tags)
+        super(Histogram, self).__init__(key, tags)
         self.lock = Lock()
         self.clock = clock
         if sample is None:

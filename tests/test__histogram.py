@@ -4,7 +4,7 @@ from pyformance.meters import Histogram
 
 class HistogramTestCase(TimedTestCase):
     def test__a_sample_of_100_from_1000(self):
-        hist = Histogram(100, 0.99)
+        hist = Histogram(key="test_histogram", size=100, alpha=0.99)
         for i in range(1000):
             hist.add(i)
 
@@ -22,7 +22,7 @@ class HistogramTestCase(TimedTestCase):
         self.assertAlmostEqual(83416.6666, hist.get_var(), delta=0.0001)
 
     def test__a_sample_of_100_from_10(self):
-        hist = Histogram(100, 0.99)
+        hist = Histogram(key="test_histogram", size=100, alpha=0.99)
         for i in range(10):
             hist.add(i)
 
@@ -40,7 +40,7 @@ class HistogramTestCase(TimedTestCase):
         self.assertAlmostEqual(9.1666, hist.get_var(), delta=0.0001)
 
     def test__a_long_wait_should_not_corrupt_sample(self):
-        hist = Histogram(10, 0.015, clock=self.clock)
+        hist = Histogram(key="test_histogram", size=10, alpha=0.015, clock=self.clock)
 
         for i in range(1000):
             hist.add(1000 + i)
