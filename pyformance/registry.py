@@ -1,7 +1,5 @@
-import functools
 import re
 import time
-import sys
 from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge, BaseMetric
 
 
@@ -92,7 +90,7 @@ class MetricsRegistry(object):
         metric_key = BaseMetric(key, tags)
         if metric_key not in self._gauges:
             if gauge is None:
-                gauge =SimpleGauge(
+                gauge = SimpleGauge(
                     key=key,
                     value=default,
                     tags=tags
@@ -360,95 +358,3 @@ def dump_metrics():
 
 def clear():
     return _global_registry.clear()
-
-
-def get_qualname(obj):
-    if sys.version_info[0] > 2:
-        return obj.__qualname__
-    return obj.__name__
-
-
-def count_calls(fn):
-    """
-    Decorator to track the number of times a function is called.
-
-    :param fn: the function to be decorated
-    :type fn: C{func}
-
-    :return: the decorated function
-    :rtype: C{func}
-    """
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        counter("%s_calls" % get_qualname(fn)).inc()
-        return fn(*args, **kwargs)
-
-    return wrapper
-
-
-def meter_calls(fn):
-    """
-    Decorator to the rate at which a function is called.
-
-    :param fn: the function to be decorated
-    :type fn: C{func}
-
-    :return: the decorated function
-    :rtype: C{func}
-    """
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        meter("%s_calls" % get_qualname(fn)).mark()
-        return fn(*args, **kwargs)
-
-    return wrapper
-
-
-def hist_calls(fn):
-    """
-    Decorator to check the distribution of return values of a function.
-
-    :param fn: the function to be decorated
-    :type fn: C{func}
-
-    :return: the decorated function
-    :rtype: C{func}
-    """
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        _histogram = histogram("%s_calls" % get_qualname(fn))
-        rtn = fn(*args, **kwargs)
-        if type(rtn) in (int, float):
-            _histogram.update(rtn)
-        return rtn
-
-    return wrapper
-
-
-def time_calls(fn):
-    """
-    Decorator to time the execution of the function.
-
-    :param fn: the function to be decorated
-    :type fn: C{func}
-
-    :return: the decorated function
-    :rtype: C{func}
-    """
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        _timer = timer("%s_calls" % get_qualname(fn))
-        with _timer.time(fn=get_qualname(fn)):
-            return fn(*args, **kwargs)
-
-    return wrapper
-
-# TODO remove
-# def _add_metric_tags_to_metrics(metric, metrics):
-#     tags = metric.get_tags()
-#     if tags:
-#         metrics["tags"] = tags

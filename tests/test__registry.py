@@ -1,6 +1,7 @@
-from pyformance import MetricsRegistry
+from pyformance import MetricsRegistry, time_calls, timer
 from pyformance.meters import Meter, BaseMetric
 from tests import TimedTestCase
+from pyformance.decorators import get_qualname
 
 
 class RegistryTestCase(TimedTestCase):
@@ -55,3 +56,33 @@ class RegistryTestCase(TimedTestCase):
             self.registry.dump_metrics(key_is_metric=True),
             {BaseMetric("test_counter", {"tag1": "val1"}): {"count": 1}}
         )
+
+    def test_time_calls_with_registry(self):
+        registry = MetricsRegistry()
+
+        @time_calls(registry=registry, tags={"tag1": "val1"})
+        def timed_func():
+            pass
+
+        timed_func()
+
+        stats = registry.get_metrics(key="timed_func_calls", tags={"tag1": "val1"})
+        print(registry.get_metrics(key="timed_func_calls", tags={"tag1": "val1"}))
+        self.assertEqual(stats["count"], 1)
+        self.assertTrue(stats["mean_rate"])
+
+    def test_time_calls(self):
+        @time_calls
+        def timed_func():
+            pass
+
+        timed_func()
+        func_timer = timer("timed_func_calls")
+        self.assertEqual(func_timer.get_count(), 1)
+        self.assertTrue(func_timer.get_mean())
+
+    def test_get_qualname(self):
+        def foo():
+            pass
+
+        self.assertEqual(get_qualname(foo), "foo")

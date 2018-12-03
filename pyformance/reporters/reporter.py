@@ -1,7 +1,8 @@
 import time
 from threading import Thread, Event
 import six
-from ..registry import global_registry, get_qualname
+from ..registry import global_registry
+from ..decorators import get_qualname
 
 
 class Reporter(object):
