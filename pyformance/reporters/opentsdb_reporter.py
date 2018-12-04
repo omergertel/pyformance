@@ -37,7 +37,7 @@ class OpenTSDBReporter(Reporter):
                                          data=json.dumps(metrics).encode("utf-8"),
                                          headers={'content-type': "application/json"})
                 authentication_data = "{0}:{1}".format(self.application_name, self.write_key)
-                auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8")))
+                auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8"))).decode("utf-8")
                 request.add_header("Authorization", "Basic {0}".format(auth_header))
                 urllib.urlopen(request)
             except Exception as e:
