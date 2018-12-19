@@ -17,8 +17,12 @@ class TestNewRelicReporter(TimedTestCase):
 
     def test_report_now(self):
         r = NewRelicReporter(
-            'license_key',
-            registry=self.registry, reporting_interval=1, clock=self.clock, name='foo')
+            "license_key",
+            registry=self.registry,
+            reporting_interval=1,
+            clock=self.clock,
+            name="foo",
+        )
         h1 = self.registry.histogram("hist")
         for i in range(10):
             h1.add(2 ** i)
@@ -33,7 +37,10 @@ class TestNewRelicReporter(TimedTestCase):
             c2.dec()
             self.clock.add(1)
         output = r.collect_metrics(self.registry)
-        expected = '{"agent": {"host": "%s", "pid": %s, "version": "%s"}, "components": [{"duration": 1, "guid": "com.github.pyformance", "metrics": {"Component/t1": {' \
-                   '"count": 1, "max": 1, "min": 1, "sum_of_squares": 1, "total": 1}}, "name": "foo"}]}' % (socket.gethostname(), os.getpid(), __version__)
+        expected = (
+            '{"agent": {"host": "%s", "pid": %s, "version": "%s"}, "components": [{"duration": 1, "guid": "com.github.pyformance", "metrics": {"Component/t1": {'
+            '"count": 1, "max": 1, "min": 1, "sum_of_squares": 1, "total": 1}}, "name": "foo"}]}'
+            % (socket.gethostname(), os.getpid(), __version__)
+        )
 
         self.assertEqual(expected.replace(".0", ""), output.replace(".0", ""))

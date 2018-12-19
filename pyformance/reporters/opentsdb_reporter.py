@@ -18,11 +18,20 @@ class OpenTSDBReporter(Reporter):
     This reporter requires a tuple (application_name, write_key) to put data to opentsdb database
     """
 
-    def __init__(self, application_name, write_key, url, registry=None, reporting_interval=10, clock=None, prefix="",
-                 tags={}):
-        super(OpenTSDBReporter, self).__init__(registry=registry,
-                                               reporting_interval=reporting_interval,
-                                               clock=clock)
+    def __init__(
+        self,
+        application_name,
+        write_key,
+        url,
+        registry=None,
+        reporting_interval=10,
+        clock=None,
+        prefix="",
+        tags={},
+    ):
+        super(OpenTSDBReporter, self).__init__(
+            registry=registry, reporting_interval=reporting_interval, clock=clock
+        )
         self.url = url
         self.application_name = application_name
         self.write_key = write_key
@@ -33,11 +42,17 @@ class OpenTSDBReporter(Reporter):
         metrics = self._collect_metrics(registry or self.registry, timestamp)
         if metrics:
             try:
-                request = urllib.Request(self.url,
-                                         data=json.dumps(metrics).encode("utf-8"),
-                                         headers={'content-type': "application/json"})
-                authentication_data = "{0}:{1}".format(self.application_name, self.write_key)
-                auth_header = base64.b64encode(bytes(authentication_data.encode("utf-8"))).decode("utf-8")
+                request = urllib.Request(
+                    self.url,
+                    data=json.dumps(metrics).encode("utf-8"),
+                    headers={"content-type": "application/json"},
+                )
+                authentication_data = "{0}:{1}".format(
+                    self.application_name, self.write_key
+                )
+                auth_header = base64.b64encode(
+                    bytes(authentication_data.encode("utf-8"))
+                ).decode("utf-8")
                 request.add_header("Authorization", "Basic {0}".format(auth_header))
                 urllib.urlopen(request)
             except Exception as e:
@@ -49,11 +64,12 @@ class OpenTSDBReporter(Reporter):
         metrics_data = []
         for key in metrics.keys():
             for value_key in metrics[key].keys():
-                metrics_data.append({
-                    'metric': "{0}{1}.{2}".format(self.prefix, key, value_key),
-                    'value': metrics[key][value_key],
-                    'timestamp': timestamp,
-                    'tags': self.tags,
-                })
+                metrics_data.append(
+                    {
+                        "metric": "{0}{1}.{2}".format(self.prefix, key, value_key),
+                        "value": metrics[key][value_key],
+                        "timestamp": timestamp,
+                        "tags": self.tags,
+                    }
+                )
         return metrics_data
-

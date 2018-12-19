@@ -3,7 +3,6 @@ from tests import TimedTestCase
 
 
 class CounterTestCase(TimedTestCase):
-
     def setUp(self):
         super(CounterTestCase, self).setUp()
         self.counter = Counter()

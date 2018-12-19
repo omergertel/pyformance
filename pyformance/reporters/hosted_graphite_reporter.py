@@ -16,10 +16,16 @@ class HostedGraphiteReporter(Reporter):
     """
 
     def __init__(
-        self, hosted_graphite_api_key, registry=None, reporting_interval=10, url="https://hostedgraphite.com/api/v1/sink",
-            clock=None):
+        self,
+        hosted_graphite_api_key,
+        registry=None,
+        reporting_interval=10,
+        url="https://hostedgraphite.com/api/v1/sink",
+        clock=None,
+    ):
         super(HostedGraphiteReporter, self).__init__(
-            registry, reporting_interval, clock)
+            registry, reporting_interval, clock
+        )
         self.url = url
         self.api_key = hosted_graphite_api_key
 
@@ -29,8 +35,10 @@ class HostedGraphiteReporter(Reporter):
             try:
                 # XXX: better use http-keepalive/pipelining somehow?
                 request = urllib2.Request(self.url, metrics)
-                request.add_header("Authorization", "Basic %s" %
-                                   base64.encodestring(self.api_key).strip())
+                request.add_header(
+                    "Authorization",
+                    "Basic %s" % base64.encodestring(self.api_key).strip(),
+                )
                 result = urllib2.urlopen(request)
             except Exception as e:
                 print(e, file=sys.stderr)
@@ -42,6 +50,10 @@ class HostedGraphiteReporter(Reporter):
         for key in metrics.keys():
             for value_key in metrics[key].keys():
                 metric_line = "%s.%s %s %s\n" % (
-                    key, value_key, metrics[key][value_key], timestamp)
+                    key,
+                    value_key,
+                    metrics[key][value_key],
+                    timestamp,
+                )
                 metrics_data.append(metric_line)
-        return ''.join(metrics_data)
+        return "".join(metrics_data)

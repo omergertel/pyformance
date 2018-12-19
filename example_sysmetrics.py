@@ -25,13 +25,15 @@ class Collector(object):
             if not whitelist or entry in whitelist:
                 for k, v in six.iteritems(stat._asdict()):
                     self.registry.gauge("disk-%s.%s" % (entry, k)).set_value(v)
-                    
+
     def collect_network_io(self, whitelist=[]):
         stats = psutil.net_io_counters(pernic=True)
         for entry, stat in six.iteritems(stats):
             if not whitelist or entry in whitelist:
                 for k, v in six.iteritems(stat._asdict()):
-                    self.registry.gauge("nic-%s.%s" % (entry.replace(" ", "_"), k)).set_value(v)
+                    self.registry.gauge(
+                        "nic-%s.%s" % (entry.replace(" ", "_"), k)
+                    ).set_value(v)
 
     def collect_cpu_times(self, whitelist=[]):
         stats = psutil.cpu_times(percpu=True)
@@ -44,23 +46,28 @@ class Collector(object):
         stats = psutil.swap_memory()
         for k, v in six.iteritems(stats._asdict()):
             self.registry.gauge("swap.%s" % k).set_value(v)
-        
+
     def collect_virtmem_usage(self):
         stats = psutil.virtual_memory()
         for k, v in six.iteritems(stats._asdict()):
-            self.registry.gauge("virtmem.%s" % k).set_value(v)    
-            
+            self.registry.gauge("virtmem.%s" % k).set_value(v)
+
     def collect_uptime(self):
         uptime = int(time.time()) - int(psutil.boot_time())
         self.registry.gauge("uptime").set_value(uptime)
 
     def collect_disk_usage(self, whitelist=[]):
         for partition in psutil.disk_partitions():
-            if not whitelist or partition.mountpoint in whitelist or partition.device in whitelist:
+            if (
+                not whitelist
+                or partition.mountpoint in whitelist
+                or partition.device in whitelist
+            ):
                 usage = psutil.disk_usage(partition.mountpoint)
                 if platform.system() == "Windows":
-                    disk_name = "-" + \
-                        partition.mountpoint.replace("\\", "").replace(":", "")
+                    disk_name = "-" + partition.mountpoint.replace("\\", "").replace(
+                        ":", ""
+                    )
                 else:
                     disk_name = partition.mountpoint.replace("/", "-")
                     if disk_name == "-":
@@ -71,9 +78,9 @@ class Collector(object):
 
     def collect_loadavgs(self):
         loadavgs = os.getloadavg()
-        self.registry.gauge('loadavg_1min').set_value(loadavgs[0])
-        self.registry.gauge('loadavg_5min').set_value(loadavgs[1])
-        self.registry.gauge('loadavg_15min').set_value(loadavgs[2])
+        self.registry.gauge("loadavg_1min").set_value(loadavgs[0])
+        self.registry.gauge("loadavg_5min").set_value(loadavgs[1])
+        self.registry.gauge("loadavg_15min").set_value(loadavgs[2])
 
     def collect(self):
         self.collect_disk_io()
@@ -85,9 +92,10 @@ class Collector(object):
         self.collect_disk_usage()
         self.collect_loadavgs()
 
-        
+
 if __name__ == "__main__":
     from pyformance.reporters import ConsoleReporter
+
     reporter = ConsoleReporter()
     col = Collector()
     col.collect()

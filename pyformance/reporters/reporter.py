@@ -5,10 +5,12 @@ from ..registry import global_registry, get_qualname
 
 
 class Reporter(object):
-
     def create_thread(self):
         # noinspection PyAttributeOutsideInit
-        self._loop_thread = Thread(target=self._loop, name="pyformance reporter {0}".format(get_qualname(type(self))))
+        self._loop_thread = Thread(
+            target=self._loop,
+            name="pyformance reporter {0}".format(get_qualname(type(self))),
+        )
         self._loop_thread.setDaemon(True)
 
     def __init__(self, registry=None, reporting_interval=30, clock=None):

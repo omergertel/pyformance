@@ -12,9 +12,15 @@ class CsvReporter(Reporter):
     Each metrics gets its own file
     """
 
-    def __init__(self, registry=None, reporting_interval=30, path=None, separator="\t", clock=None):
-        super(CsvReporter, self).__init__(
-            registry, reporting_interval, clock)
+    def __init__(
+        self,
+        registry=None,
+        reporting_interval=30,
+        path=None,
+        separator="\t",
+        clock=None,
+    ):
+        super(CsvReporter, self).__init__(registry, reporting_interval, clock)
         self.path = path or os.getcwd()
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -26,8 +32,7 @@ class CsvReporter(Reporter):
 
     def _save_metrics(self, registry, timestamp=None):
         timestamp = timestamp or int(round(self.clock.time()))
-        dt = datetime.datetime(1970, 1, 1) + \
-            datetime.timedelta(seconds=timestamp)
+        dt = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=timestamp)
         date = dt.strftime("%Y-%m-%d %H:%M:%S")
         metrics = registry.dump_metrics()
         for key in metrics.keys():
@@ -54,4 +59,3 @@ class CsvReporter(Reporter):
     def __exit__(self, type, value, traceback):
         for f in self.files.values():
             f.close()
-

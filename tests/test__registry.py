@@ -4,8 +4,6 @@ from tests import TimedTestCase
 
 
 class RegistryTestCase(TimedTestCase):
-
-
     def setUp(self):
         super(RegistryTestCase, self).setUp()
         self.registry = MetricsRegistry(TimedTestCase.clock)
@@ -14,4 +12,4 @@ class RegistryTestCase(TimedTestCase):
         super(RegistryTestCase, self).tearDown()
 
     def test__add(self):
-        self.registry.add('foo', Meter(TimedTestCase.clock))
+        self.registry.add("foo", Meter(TimedTestCase.clock))

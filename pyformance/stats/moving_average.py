@@ -7,6 +7,7 @@ class ExpWeightedMovingAvg(object):
     """
     An exponentially-weighted moving average.
     """
+
     INTERVAL = 5.0  # seconds
     SECONDS_PER_MINUTE = 60.0
 
@@ -51,7 +52,7 @@ class ExpWeightedMovingAvg(object):
         self.uncounted = 0.0
 
         if self.rate >= 0:
-            self.rate += (self._alpha(interval) * (instant_rate - self.rate))
+            self.rate += self._alpha(interval) * (instant_rate - self.rate)
         else:
             self.rate = instant_rate
 
