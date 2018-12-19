@@ -3,7 +3,6 @@ from tests import TimedTestCase
 
 
 class TimerTestCase(TimedTestCase):
-
     def setUp(self):
         super(TimerTestCase, self).setUp()
         self.timer = Timer()

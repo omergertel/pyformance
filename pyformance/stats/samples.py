@@ -49,8 +49,7 @@ class ExpDecayingSample(object):
         self.priorities = []
         self.counter = 0
         self.start_time = self.clock.time()
-        self.next_time = self.clock.time() + \
-            ExpDecayingSample.RESCALE_THREASHOLD
+        self.next_time = self.clock.time() + ExpDecayingSample.RESCALE_THREASHOLD
 
     def get_size(self):
         return self.counter if self.counter < self.size else self.size
@@ -65,8 +64,7 @@ class ExpDecayingSample(object):
         if self.size == 0:
             return
         self._rescale_if_necessary()
-        priority = self._weight(
-            self.clock.time() - self.start_time) / random.random()
+        priority = self._weight(self.clock.time() - self.start_time) / random.random()
         new_counter = self.counter + 1
         self.counter = new_counter
 
@@ -90,15 +88,13 @@ class ExpDecayingSample(object):
             self._rescale()
 
     def _rescale(self):
-        self.next_time = self.clock.time() + \
-            ExpDecayingSample.RESCALE_THREASHOLD
+        self.next_time = self.clock.time() + ExpDecayingSample.RESCALE_THREASHOLD
         old_start_time = self.start_time
         self.start_time = self.clock.time()
         new_values = {}
         new_priorities = []
         for key, val in self.values.items():
-            priority = key * \
-                math.exp(-self.alpha * (self.start_time - old_start_time))
+            priority = key * math.exp(-self.alpha * (self.start_time - old_start_time))
             new_values[priority] = val
             heapq.heappush(new_priorities, priority)
         self.values = new_values

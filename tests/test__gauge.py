@@ -3,7 +3,6 @@ from tests import TimedTestCase
 
 
 class CallbackGaugeTestCase(TimedTestCase):
-
     def setUp(self):
         super(CallbackGaugeTestCase, self).setUp()
         self._value = None

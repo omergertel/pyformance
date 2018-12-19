@@ -10,6 +10,7 @@ from pyformance.reporters.influx import InfluxReporter
 from pyformance import MetricsRegistry
 from tests import TimedTestCase
 
+
 class TestInfluxReporter(TimedTestCase):
     def setUp(self):
         super(TestInfluxReporter, self).setUp()
@@ -31,4 +32,7 @@ class TestInfluxReporter(TimedTestCase):
             r1.report_now()
             if patch.call_count != 2:
                 raise AssertionError(
-                    "Expected 2 calls to 'urlopen'. Received: {}".format(patch.call_count))
+                    "Expected 2 calls to 'urlopen'. Received: {}".format(
+                        patch.call_count
+                    )
+                )

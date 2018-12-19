@@ -13,7 +13,8 @@ class MetricsRegistry(object):
     a reference back to its service. The service would create a
     L{MetricsRegistry} to manage all of its metrics tools.
     """
-    def __init__(self, clock = time):
+
+    def __init__(self, clock=time):
         """
         Creates a new L{MetricsRegistry} instance.
         """
@@ -35,11 +36,11 @@ class MetricsRegistry(object):
         :param metric: instance of Histogram, Meter, Gauge, Timer or Counter
         """
         class_map = (
-           (Histogram, self._histograms),
-           (Meter, self._meters),
-           (Gauge, self._gauges),
-           (Timer, self._timers),
-           (Counter, self._counters),
+            (Histogram, self._histograms),
+            (Meter, self._meters),
+            (Gauge, self._gauges),
+            (Timer, self._timers),
+            (Counter, self._counters),
         )
         for cls, registry in class_map:
             if isinstance(metric, cls):
@@ -79,7 +80,8 @@ class MetricsRegistry(object):
         if key not in self._gauges:
             if gauge is None:
                 gauge = SimpleGauge(
-                    default)  # raise TypeError("gauge required for registering")
+                    default
+                )  # raise TypeError("gauge required for registering")
             elif not isinstance(gauge, Gauge):
                 if not callable(gauge):
                     raise TypeError("gauge getter not callable")
@@ -139,26 +141,30 @@ class MetricsRegistry(object):
         if key in self._histograms:
             histogram = self._histograms[key]
             snapshot = histogram.get_snapshot()
-            res = {"avg": snapshot.get_mean(),
-                   "count": histogram.get_count(),
-                   "max": snapshot.get_max(),
-                   "min": snapshot.get_min(),
-                   "std_dev": snapshot.get_stddev(),
-                   "75_percentile": snapshot.get_75th_percentile(),
-                   "95_percentile": snapshot.get_95th_percentile(),
-                   "99_percentile": snapshot.get_99th_percentile(),
-                   "999_percentile": snapshot.get_999th_percentile()}
+            res = {
+                "avg": snapshot.get_mean(),
+                "count": histogram.get_count(),
+                "max": snapshot.get_max(),
+                "min": snapshot.get_min(),
+                "std_dev": snapshot.get_stddev(),
+                "75_percentile": snapshot.get_75th_percentile(),
+                "95_percentile": snapshot.get_95th_percentile(),
+                "99_percentile": snapshot.get_99th_percentile(),
+                "999_percentile": snapshot.get_999th_percentile(),
+            }
             return res
         return {}
 
     def _get_meter_metrics(self, key):
         if key in self._meters:
             meter = self._meters[key]
-            res = {"count": meter.get_count(),
-                   "15m_rate": meter.get_fifteen_minute_rate(),
-                   "5m_rate": meter.get_five_minute_rate(),
-                   "1m_rate": meter.get_one_minute_rate(),
-                   "mean_rate": meter.get_mean_rate()}
+            res = {
+                "count": meter.get_count(),
+                "15m_rate": meter.get_fifteen_minute_rate(),
+                "5m_rate": meter.get_five_minute_rate(),
+                "1m_rate": meter.get_one_minute_rate(),
+                "mean_rate": meter.get_mean_rate(),
+            }
             return res
         return {}
 
@@ -166,21 +172,23 @@ class MetricsRegistry(object):
         if key in self._timers:
             timer = self._timers[key]
             snapshot = timer.get_snapshot()
-            res = {"avg": timer.get_mean(),
-                   "sum": timer.get_sum(),
-                   "count": timer.get_count(),
-                   "max": timer.get_max(),
-                   "min": timer.get_min(),
-                   "std_dev": timer.get_stddev(),
-                   "15m_rate": timer.get_fifteen_minute_rate(),
-                   "5m_rate": timer.get_five_minute_rate(),
-                   "1m_rate": timer.get_one_minute_rate(),
-                   "mean_rate": timer.get_mean_rate(),
-                   "50_percentile": snapshot.get_median(),
-                   "75_percentile": snapshot.get_75th_percentile(),
-                   "95_percentile": snapshot.get_95th_percentile(),
-                   "99_percentile": snapshot.get_99th_percentile(),
-                   "999_percentile": snapshot.get_999th_percentile()}
+            res = {
+                "avg": timer.get_mean(),
+                "sum": timer.get_sum(),
+                "count": timer.get_count(),
+                "max": timer.get_max(),
+                "min": timer.get_min(),
+                "std_dev": timer.get_stddev(),
+                "15m_rate": timer.get_fifteen_minute_rate(),
+                "5m_rate": timer.get_five_minute_rate(),
+                "1m_rate": timer.get_one_minute_rate(),
+                "mean_rate": timer.get_mean_rate(),
+                "50_percentile": snapshot.get_median(),
+                "75_percentile": snapshot.get_75th_percentile(),
+                "95_percentile": snapshot.get_95th_percentile(),
+                "99_percentile": snapshot.get_99th_percentile(),
+                "999_percentile": snapshot.get_999th_percentile(),
+            }
             return res
         return {}
 
@@ -194,9 +202,13 @@ class MetricsRegistry(object):
         :return: C{dict}
         """
         metrics = {}
-        for getter in (self._get_counter_metrics, self._get_histogram_metrics,
-                       self._get_meter_metrics, self._get_timer_metrics,
-                       self._get_gauge_metrics):
+        for getter in (
+            self._get_counter_metrics,
+            self._get_histogram_metrics,
+            self._get_meter_metrics,
+            self._get_timer_metrics,
+            self._get_gauge_metrics,
+        ):
             metrics.update(getter(key))
         return metrics
 
@@ -207,11 +219,13 @@ class MetricsRegistry(object):
         :return: C{list} of C{dict} of metrics
         """
         metrics = {}
-        for metric_type in (self._counters,
-                            self._histograms,
-                            self._meters,
-                            self._timers,
-                            self._gauges):
+        for metric_type in (
+            self._counters,
+            self._histograms,
+            self._meters,
+            self._timers,
+            self._gauges,
+        ):
             for key in metric_type.keys():
                 metrics[key] = self.get_metrics(key)
 
@@ -229,16 +243,17 @@ class RegexRegistry(MetricsRegistry):
         /api/users/1/edit -> users/edit
         /api/users/2/edit -> users/edit
     """
-    def __init__(self, pattern = None, clock = time):
+
+    def __init__(self, pattern=None, clock=time):
         super(RegexRegistry, self).__init__(clock)
         if pattern is not None:
             self.pattern = re.compile(pattern)
         else:
-            self.pattern = re.compile('^$')
+            self.pattern = re.compile("^$")
 
     def _get_key(self, key):
         matches = self.pattern.finditer(key)
-        key = '/'.join((v for match in matches for v in match.groups() if v))
+        key = "/".join((v for match in matches for v in match.groups() if v))
         return key
 
     def timer(self, key):
@@ -296,10 +311,12 @@ def dump_metrics():
 def clear():
     return _global_registry.clear()
 
+
 def get_qualname(obj):
     if sys.version_info[0] > 2:
         return obj.__qualname__
     return obj.__name__
+
 
 def count_calls(fn):
     """
@@ -311,10 +328,12 @@ def count_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         counter("%s_calls" % get_qualname(fn)).inc()
         return fn(*args, **kwargs)
+
     return wrapper
 
 
@@ -328,10 +347,12 @@ def meter_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         meter("%s_calls" % get_qualname(fn)).mark()
         return fn(*args, **kwargs)
+
     return wrapper
 
 
@@ -345,6 +366,7 @@ def hist_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         _histogram = histogram("%s_calls" % get_qualname(fn))
@@ -352,6 +374,7 @@ def hist_calls(fn):
         if type(rtn) in (int, float):
             _histogram.update(rtn)
         return rtn
+
     return wrapper
 
 
@@ -365,10 +388,11 @@ def time_calls(fn):
     :return: the decorated function
     :rtype: C{func}
     """
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         _timer = timer("%s_calls" % get_qualname(fn))
-        with _timer.time(fn = get_qualname(fn)):
+        with _timer.time(fn=get_qualname(fn)):
             return fn(*args, **kwargs)
-    return wrapper
 
+    return wrapper

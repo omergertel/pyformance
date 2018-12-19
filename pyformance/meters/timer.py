@@ -1,4 +1,5 @@
 import time
+
 try:
     from blinker import Namespace
 except ImportError:
@@ -21,8 +22,15 @@ class Timer(object):
 
     """
 
-    def __init__(self, threshold=None, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA,
-                 clock=time, sink=None, sample=None):
+    def __init__(
+        self,
+        threshold=None,
+        size=DEFAULT_SIZE,
+        alpha=DEFAULT_ALPHA,
+        clock=time,
+        sink=None,
+        sample=None,
+    ):
         super(Timer, self).__init__()
         self.meter = Meter(clock=clock)
         self.hist = Histogram(size=size, alpha=alpha, clock=clock, sample=sample)
@@ -99,7 +107,6 @@ class Timer(object):
 
 
 class TimerContext(object):
-
     def __init__(self, timer, clock, *args, **kwargs):
         super(TimerContext, self).__init__()
         self.clock = clock
@@ -111,9 +118,12 @@ class TimerContext(object):
     def stop(self):
         elapsed = self.clock.time() - self.start_time
         self.timer._update(elapsed)
-        if self.timer.threshold and self.timer.threshold < elapsed and call_too_long is not None:
-            call_too_long.send(
-                self.timer, elapsed=elapsed, *self.args, **self.kwargs)
+        if (
+            self.timer.threshold
+            and self.timer.threshold < elapsed
+            and call_too_long is not None
+        ):
+            call_too_long.send(self.timer, elapsed=elapsed, *self.args, **self.kwargs)
         return elapsed
 
     def __enter__(self):

@@ -3,7 +3,6 @@ from pyformance.meters import Histogram
 
 
 class HistogramTestCase(TimedTestCase):
-
     def test__a_sample_of_100_from_1000(self):
         hist = Histogram(100, 0.99)
         for i in range(1000):

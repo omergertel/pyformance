@@ -1,7 +1,7 @@
 import time
 import math
 from threading import Lock
-from ..stats. samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
+from ..stats.samples import ExpDecayingSample, DEFAULT_SIZE, DEFAULT_ALPHA
 
 
 class Histogram(object):
@@ -10,8 +10,7 @@ class Histogram(object):
     A metric which calculates the distribution of a value.
     """
 
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time,
-                 sample=None):
+    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA, clock=time, sample=None):
         """
         Creates a new instance of a L{Histogram}.
         """
