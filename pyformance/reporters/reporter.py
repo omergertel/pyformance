@@ -39,8 +39,8 @@ class Reporter(object):
         self._stopped.set()
 
     def _loop(self):
-        next_loop_time = time.time()
         while not self._stopped.is_set():
+            next_loop_time = time.time()
             try:
                 self.report_now(self.registry)
             except:
