@@ -2,7 +2,15 @@ import functools
 import re
 import time
 import sys
-from .meters import Counter, Histogram, Meter, Timer, Gauge, CallbackGauge, SimpleGauge
+from .meters import (
+    Counter,
+    Histogram,
+    Meter,
+    Timer,
+    Gauge,
+    CallbackGauge,
+    SimpleGauge,
+)
 
 
 class MetricsRegistry(object):
@@ -65,7 +73,8 @@ class MetricsRegistry(object):
 
     def histogram(self, key):
         """
-        Gets a histogram based on a key, creates a new one if it does not exist.
+        Gets a histogram based on a key, creates a new one if it does not
+        exist.
 
         :param key: name of the metric
         :type key: C{str}
@@ -115,7 +124,9 @@ class MetricsRegistry(object):
         :return: L{Timer}
         """
         if key not in self._timers:
-            self._timers[key] = Timer(clock=self._clock, sink=self.create_sink())
+            self._timers[key] = Timer(
+                clock=self._clock, sink=self.create_sink()
+            )
         return self._timers[key]
 
     def clear(self):
@@ -235,10 +246,11 @@ class MetricsRegistry(object):
 class RegexRegistry(MetricsRegistry):
 
     """
-    A single interface used to gather metrics on a service. This class uses a regex to combine
-    measures that match a pattern. For example, if you have a REST API, instead of defining
-    a timer for each method, you can use a regex to capture all API calls and group them.
-    A pattern like '^/api/(?P<model>)/\d+/(?P<verb>)?$' will group and measure the following:
+    A single interface used to gather metrics on a service. This class uses a
+    regex to combine measures that match a pattern. For example, if you have a
+    REST API, instead of defining a timer for each method, you can use a regex
+    to capture all API calls and group them. A pattern like
+    '^/api/(?P<model>)/\d+/(?P<verb>)?$' will group and measure the following:
         /api/users/1 -> users
         /api/users/1/edit -> users/edit
         /api/users/2/edit -> users/edit
@@ -266,7 +278,9 @@ class RegexRegistry(MetricsRegistry):
         return super(RegexRegistry, self).counter(self._get_key(key))
 
     def gauge(self, key, gauge=None, default=float("nan")):
-        return super(RegexRegistry, self).gauge(self._get_key(key), gauge, default)
+        return super(RegexRegistry, self).gauge(
+            self._get_key(key), gauge, default
+        )
 
     def meter(self, key):
         return super(RegexRegistry, self).meter(self._get_key(key))
@@ -318,7 +332,7 @@ def get_qualname(obj):
     return obj.__name__
 
 
-def count_calls(fn):
+def count_calls(fn=None, metric_name=None):
     """
     Decorator to track the number of times a function is called.
 
@@ -329,15 +343,21 @@ def count_calls(fn):
     :rtype: C{func}
     """
 
+    if fn is None:
+        return functools.partial(count_calls, metric_name=metric_name)
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        counter("%s_calls" % get_qualname(fn)).inc()
+        if metric_name is None:
+            counter("%s_calls" % get_qualname(fn)).inc()
+        else:
+            counter(metric_name).inc()
         return fn(*args, **kwargs)
 
     return wrapper
 
 
-def meter_calls(fn):
+def meter_calls(fn=None, metric_name=None):
     """
     Decorator to the rate at which a function is called.
 
@@ -348,15 +368,21 @@ def meter_calls(fn):
     :rtype: C{func}
     """
 
+    if fn is None:
+        return functools.partial(meter_calls, metric_name=metric_name)
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        meter("%s_calls" % get_qualname(fn)).mark()
+        if metric_name is None:
+            meter("%s_calls" % get_qualname(fn)).mark()
+        else:
+            meter(metric_name).mark()
         return fn(*args, **kwargs)
 
     return wrapper
 
 
-def hist_calls(fn):
+def hist_calls(fn=None, metric_name=None):
     """
     Decorator to check the distribution of return values of a function.
 
@@ -367,9 +393,15 @@ def hist_calls(fn):
     :rtype: C{func}
     """
 
+    if fn is None:
+        return functools.partial(hist_calls, metric_name=metric_name)
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        _histogram = histogram("%s_calls" % get_qualname(fn))
+        if metric_name is None:
+            _histogram = histogram("%s_calls" % get_qualname(fn))
+        else:
+            _histogram = histogram(metric_name)
         rtn = fn(*args, **kwargs)
         if type(rtn) in (int, float):
             _histogram.update(rtn)
@@ -378,7 +410,7 @@ def hist_calls(fn):
     return wrapper
 
 
-def time_calls(fn):
+def time_calls(fn=None, metric_name=None):
     """
     Decorator to time the execution of the function.
 
@@ -389,9 +421,16 @@ def time_calls(fn):
     :rtype: C{func}
     """
 
+    if fn is None:
+        return functools.partial(time_calls, metric_name=metric_name)
+
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        _timer = timer("%s_calls" % get_qualname(fn))
+        if metric_name is None:
+            _timer = timer("%s_calls" % get_qualname(fn))
+        else:
+            _timer = timer(metric_name)
+
         with _timer.time(fn=get_qualname(fn)):
             return fn(*args, **kwargs)
 

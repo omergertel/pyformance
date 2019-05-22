@@ -48,6 +48,23 @@ You can use the 'count_calls' decorator to count the number of times a function 
     >>> print counter("test_calls").get_count()
     10
 
+If you want a specific metric name, you can provide that as the keyword
+argument `metric_name` to the decorator.
+
+.. code-block:: python
+
+    >>> from pyformance import counter, count_calls
+    >>> @count_calls(metric_name="test.count")
+    ... def test():
+    ...     pass
+    ... 
+    >>> for i in range(10):
+    ...     test()
+    ... 
+    >>> print counter("test.count").get_count()
+    10
+
+
 
 *Timer*
 
@@ -66,6 +83,25 @@ You can use the 'time_calls' decorator to time the execution of a function and g
     ... 
     >>> print timer("test_calls").get_mean()
     0.100820207596
+
+
+If you want a specific metric name, you can provide that as the keyword
+argument `metric_name` to the decorator.
+
+.. code-block:: python
+
+    >>> import time
+    >>> from pyformance import timer, time_calls
+    >>> @time_calls("test.timer")
+    ... def test():
+    ...     time.sleep(0.1)
+    ... 
+    >>> for i in range(10):
+    ...     test()
+    ... 
+    >>> print timer("test.timer").get_mean()
+    0.100820207596
+
 
 
 With statement
