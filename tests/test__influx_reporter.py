@@ -22,17 +22,17 @@ class TestInfluxReporter(TimedTestCase):
     def test_report_now(self):
         influx_reporter = InfluxReporter(registry=self.registry)
 
-        with mock.patch("pyformance.reporters.influx.urlopen") as patch:
+        with mock.patch("influxdb.InfluxDBClient.write_points") as patch:
             influx_reporter.report_now()
             patch.assert_called()
 
     def test_create_database(self):
         r1 = InfluxReporter(registry=self.registry, autocreate_database=True)
-        with mock.patch("pyformance.reporters.influx.urlopen") as patch:
+        with mock.patch("pyformance.reporters.influx.InfluxReporter._create_database") as patch:
             r1.report_now()
-            if patch.call_count != 2:
+            if patch.call_count != 1:
                 raise AssertionError(
-                    "Expected 2 calls to 'urlopen'. Received: {}".format(
+                    "Expected 1 calls to '_create_database'. Received: {}".format(
                         patch.call_count
                     )
                 )
