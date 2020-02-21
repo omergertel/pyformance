@@ -57,7 +57,6 @@ class InfluxReporter(Reporter):
         self.autocreate_database = autocreate_database
         self._did_create_database = False
         self._influxDBClient = None
-        self._get_connection()
 
     def _get_connection(self):
         if self._influxDBClient is None:
@@ -70,14 +69,14 @@ class InfluxReporter(Reporter):
 
     def _create_database(self):
         try:
+            self._get_connection()
             self._influxDBClient.create_database(self.database)
             self._did_create_database = True
-        except URLError as err:
+        except Exception as err:
             LOG.warning(
-                "Cannot create database %s to %s: %s",
+                "Cannot create database %s to %s, %s",
                 self.database,
-                self.server,
-                err.reason,
+                self.server
             )
 
     def report_now(self, registry=None, timestamp=None):
