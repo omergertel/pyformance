@@ -2,6 +2,7 @@
 
 import base64
 import logging
+from datetime import datetime
 
 try:
     from urllib2 import quote, urlopen, Request, URLError
@@ -9,6 +10,8 @@ except ImportError:
     from urllib.error import URLError
     from urllib.parse import quote
     from urllib.request import urlopen, Request
+
+from influxdb import InfluxDBClient
 
 from .reporter import Reporter
 
@@ -53,60 +56,49 @@ class InfluxReporter(Reporter):
         self.server = server
         self.autocreate_database = autocreate_database
         self._did_create_database = False
+        self._influxDBClient = None
+
+    def _get_connection(self):
+        if self._influxDBClient is None:
+            self._influxDBClient = InfluxDBClient(host=self.server,
+                                                  port=self.port,
+                                                  username=self.username,
+                                                  password=self.password,
+                                                  database=self.database)
+        return self._influxDBClient
 
     def _create_database(self):
-        url = "%s://%s:%s/query" % (self.protocol, self.server, self.port)
-        q = quote("CREATE DATABASE %s" % self.database)
-        request = Request(url + "?q=" + q)
-        if self.username:
-            auth = _encode_username(self.username, self.password)
-            request.add_header("Authorization", "Basic %s" % auth.decode("utf-8"))
         try:
-            response = urlopen(request)
-            _result = response.read()
-            # Only set if we actually were able to get a successful response
+            self._get_connection()
+            self._influxDBClient.create_database(self.database)
             self._did_create_database = True
-        except URLError as err:
+        except Exception as err:
             LOG.warning(
-                "Cannot create database %s to %s: %s",
+                "Cannot create database %s to %s, %s",
                 self.database,
-                self.server,
-                err.reason,
+                self.server
             )
 
     def report_now(self, registry=None, timestamp=None):
         if self.autocreate_database and not self._did_create_database:
             self._create_database()
-        timestamp = timestamp or int(round(self.clock.time()))
+        timestamp = timestamp or datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         metrics = (registry or self.registry).dump_metrics()
-        post_data = []
+        json_body = []
+        client = self._get_connection()
         for key, metric_values in metrics.items():
             if not self.prefix:
-                table = key
+                measurement = key
             else:
-                table = "%s.%s" % (self.prefix, key)
-            values = ",".join(
-                [
-                    "%s=%s" % (k, v if type(v) is not str else '"{}"'.format(v))
-                    for (k, v) in metric_values.items()
-                ]
-            )
-            line = "%s %s %s" % (table, values, timestamp)
-            post_data.append(line)
-        post_data = "\n".join(post_data)
-        path = "/write?db=%s&precision=s" % self.database
-        url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
-        request = Request(url, post_data.encode("utf-8"))
-        if self.username:
-            auth = _encode_username(self.username, self.password)
-            request.add_header("Authorization", "Basic %s" % auth.decode("utf-8"))
+                measurement = "%s.%s" % (self.prefix, key)
+            fields = {k: v for (k, v) in metric_values.items()}
+            tags = {}
+            json_body.append({"measurement": measurement,
+                              "tags": tags,
+                              "time": timestamp,
+                              "fields": fields})
         try:
-            response = urlopen(request)
-            response.read()
+            client.write_points(json_body)
         except URLError as err:
             LOG.warning("Cannot write to %s: %s", self.server, err.reason)
 
-
-def _encode_username(username, password):
-    auth_string = ("%s:%s" % (username, password)).encode()
-    return base64.b64encode(auth_string)
