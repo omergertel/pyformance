@@ -8,7 +8,7 @@ _IN_PACKAGE_DIR = functools.partial(os.path.join, "pyformance")
 with open(_IN_PACKAGE_DIR("__version__.py")) as version_file:
     exec(version_file.read())
 
-install_requires = ["six"]  # optional: ["blinker==1.2"]
+install_requires = ["six", "influxdb"]  # optional: ["blinker==1.2"]
 if platform.python_version() < "2.7":
     install_requires.append("unittest2")
 
