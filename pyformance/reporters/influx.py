@@ -42,6 +42,7 @@ class InfluxReporter(Reporter):
         protocol=DEFAULT_INFLUX_PROTOCOL,
         autocreate_database=False,
         clock=None,
+        retention_policy="autogen",
     ):
         super(InfluxReporter, self).__init__(registry, reporting_interval, clock)
         self.prefix = prefix
@@ -53,6 +54,7 @@ class InfluxReporter(Reporter):
         self.server = server
         self.autocreate_database = autocreate_database
         self._did_create_database = False
+        self.retention_policy = retention_policy
 
     def _create_database(self):
         url = "%s://%s:%s/query" % (self.protocol, self.server, self.port)
@@ -94,7 +96,7 @@ class InfluxReporter(Reporter):
             line = "%s %s %s" % (table, values, timestamp)
             post_data.append(line)
         post_data = "\n".join(post_data)
-        path = "/write?db=%s&precision=s" % self.database
+        path = "/write?db=%s&precision=s&rp=%s" % (self.database, self.retention_policy)
         url = "%s://%s:%s%s" % (self.protocol, self.server, self.port, path)
         request = Request(url, post_data.encode("utf-8"))
         if self.username:
