@@ -1,8 +1,11 @@
+import logging
 import time
 from threading import Thread, Event
 import six
 from ..registry import global_registry, get_qualname
 
+
+LOG = logging.getLogger(__name__)
 
 class Reporter(object):
     def create_thread(self):
@@ -43,7 +46,8 @@ class Reporter(object):
         while not self._stopped.is_set():
             try:
                 self.report_now(self.registry)
-            except:
+            except Exception as e:
+                LOG.error("Exception caught while reporting metrics", exc_info=e)
                 pass
             next_loop_time += self.reporting_interval
             wait = max(0, next_loop_time - time.time())
